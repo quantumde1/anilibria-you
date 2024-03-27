@@ -40,6 +40,7 @@ fun ImageCard(imageUrl: String, cardText: String) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
+
         ) {
             Image(
                 painter = rememberImagePainter(imageUrl,
@@ -55,13 +56,13 @@ fun ImageCard(imageUrl: String, cardText: String) {
             Text(
                 text = cardText,
                 modifier = Modifier
-                    .align(Alignment.BottomStart)
                     .background(
                         Brush.verticalGradient(
-                            colors = listOf(Color.Black.copy(alpha = 0.3f), Color.Transparent),
-                            startY = Float.POSITIVE_INFINITY
+                            colors = listOf(Color.Transparent, Color.Black.copy(alpha = 0.7f)),
+                            startY = 300f
                         )
                     )
+                    .align(Alignment.BottomStart)
                     .fillMaxWidth()
                     .padding(10.dp),
                 color = Color.White,
