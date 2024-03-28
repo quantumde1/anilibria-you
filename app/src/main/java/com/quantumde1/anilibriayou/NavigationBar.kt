@@ -1,5 +1,6 @@
 package com.quantumde1.anilibriayou
 
+import android.net.Uri
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.material.icons.Icons
@@ -40,12 +41,22 @@ fun MyBottomBar(
                     label = { Text(item.title) },
                     selected = selected,
                     onClick = {
-                        if (!selected) {
-                            navController.navigate(item.route) {
-                                // Avoid multiple copies of the same destination when reselecting the same item
-                                popUpTo(navController.graph.startDestinationId)
-                                launchSingleTop = true
+                        if (item.route == "home") {
+                            navController.navigate("home")
+                        } else if (item.route == "favorites") {
+                            navController.navigate("favorites")
+                        } else if (item.route == "profile") {
+                            navController.navigate("profile")
+                        } else if (item.route == "animeDetails") {
+                            val animeId =
+                                navController.previousBackStackEntry?.arguments?.getInt("animeId")
+                            if (animeId != null) {
+                                navController.navigate("animeDetailsScreen/$animeId")
                             }
+                        } else if (item.route == "LonePlayer") {
+                            val uri = navController.previousBackStackEntry?.arguments?.getString("uri")
+                            val encodedUri = Uri.encode(uri)
+                            navController.navigate("LonePlayer/$encodedUri")
                         }
                     }
                 )

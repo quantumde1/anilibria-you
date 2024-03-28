@@ -47,27 +47,39 @@ android {
 }
 
 dependencies {
+    def media3_version = "1.3.0"
+
+    // For media playback using ExoPlayer
+    implementation libs.androidx.ui.v111
+    implementation "androidx.compose.runtime:runtime:1.6.4"
+    implementation "androidx.media3:media3-exoplayer:$media3_version"
+    implementation "androidx.media3:media3-exoplayer-hls:$media3_version"
+    implementation "androidx.media3:media3-ui:$media3_version"
+    // For exposing and controlling media sessions
+    implementation "androidx.media3:media3-session:$media3_version"
+    implementation "androidx.media3:media3-container:$media3_version"
+    // Common functionality for media database components
+    implementation "androidx.media3:media3-database:$media3_version"
+    // Common functionality for media decoders
+    implementation "androidx.media3:media3-decoder:$media3_version"
+    // Common functionality for loading data
+    implementation "androidx.media3:media3-datasource:$media3_version"
+    // Common functionality used across multiple media libraries
+    implementation "androidx.media3:media3-common:$media3_version"
+
     implementation libs.material3
     implementation "androidx.compose.runtime:runtime-livedata"
-    implementation 'com.squareup.okhttp3:logging-interceptor:4.9.3'
-    implementation 'com.squareup.retrofit2:retrofit:2.9.0'
-    implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
-    implementation "io.coil-kt:coil-compose:2.1.0"
-    implementation 'com.squareup.okhttp3:okhttp:4.9.3'
-    implementation 'com.google.code.gson:gson:2.8.9'
-    // Make sure to include the corresponding compose ui and tooling dependencies
-    implementation libs.ui
-    implementation libs.ui.tooling.preview
-    // Add other necessary dependencies for your project
+    implementation libs.logging.interceptor
+    implementation libs.retrofit
+    implementation libs.converter.gson
+    implementation libs.coil.compose
+    implementation libs.okhttp
+    implementation libs.gson
     implementation libs.androidx.core.ktx
     implementation libs.androidx.lifecycle.runtime.ktx
     implementation libs.androidx.activity.compose
     implementation libs.androidx.navigation.compose
     implementation platform(libs.androidx.compose.bom)
-    implementation libs.androidx.ui
-    implementation libs.androidx.ui.graphics
-    implementation libs.androidx.ui.tooling.preview
-    implementation libs.androidx.material3
     testImplementation libs.junit
     androidTestImplementation libs.androidx.junit
     androidTestImplementation libs.androidx.espresso.core

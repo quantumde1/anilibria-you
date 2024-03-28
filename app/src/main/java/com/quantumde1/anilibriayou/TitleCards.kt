@@ -3,6 +3,7 @@ package com.quantumde1.anilibriayou
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
@@ -19,10 +20,19 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import coil.compose.rememberImagePainter
 
 @Composable
-fun ImageCard(imageUrl: String, cardText: String) {
+fun ImageCard(navController: NavController, title: Title) {
+    val imageUrl = "https://static.wwnd.space/${title.posters.original.url}"
+    val cardText = title.names.ru
+    val truncatedText = if (cardText.length > 20) {
+        cardText.take(28) + "..."
+    } else {
+        cardText
+    }
+
     val configuration = LocalConfiguration.current
     val screenWidth = configuration.screenWidthDp.dp
     val screenHeight = configuration.screenHeightDp.dp
@@ -33,7 +43,10 @@ fun ImageCard(imageUrl: String, cardText: String) {
         modifier = Modifier
             .width(cardWidth)
             .height(cardHeight)
-            .padding(10.dp),
+            .padding(10.dp)
+            .clickable {
+                navController.navigate("animeDetails/${title.id}")
+            },
         shape = RoundedCornerShape(15.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 5.dp)
     ) {
@@ -48,13 +61,13 @@ fun ImageCard(imageUrl: String, cardText: String) {
                         listener(onError = { _, throwable ->
                             Log.e("ImageCard", "Error loading image", throwable.throwable)
                         })// Replace with your error drawable resource
-                }), // Use Coil to load the image from the URL
-                contentDescription = cardText,
+                    }), // Use Coil to load the image from the URL
+                contentDescription = truncatedText,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxSize()
             )
             Text(
-                text = cardText,
+                text = truncatedText,
                 modifier = Modifier
                     .background(
                         Brush.verticalGradient(
