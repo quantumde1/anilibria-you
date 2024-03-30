@@ -7,16 +7,20 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.compose.runtime.mutableStateOf
 
 @RequiresApi(Build.VERSION_CODES.S)
 @Composable
@@ -24,11 +28,14 @@ fun MyBottomBar(
     navController: NavController,
     modifier: Modifier = Modifier
 ) {
-    MyDynamicTheme {
+    val context = LocalContext.current
+    val (themeSettings, setThemeSettings) = remember { mutableStateOf(PreferencesManager.getSettings(context)) }
+
+    MyDynamicTheme (){
         val items = listOf(
             NavigationItem("Релизы", Icons.Filled.Home, "home"),
-            NavigationItem("Избранное", Icons.Filled.Favorite, "favorites"),
-            NavigationItem("Профиль", Icons.Filled.Person, "profile")
+            NavigationItem("Профиль", Icons.Filled.Person, "profile"),
+            NavigationItem("Настройки", Icons.Filled.Settings, "settings")
         )
 
         NavigationBar(modifier = modifier) {
@@ -43,8 +50,8 @@ fun MyBottomBar(
                     onClick = {
                         if (item.route == "home") {
                             navController.navigate("home")
-                        } else if (item.route == "favorites") {
-                            navController.navigate("favorites")
+                        } else if (item.route == "settings") {
+                            navController.navigate("settings")
                         } else if (item.route == "profile") {
                             navController.navigate("profile")
                         } else if (item.route == "animeDetails") {

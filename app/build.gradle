@@ -53,7 +53,6 @@ dependencies {
     // For media playback using ExoPlayer
     implementation libs.androidx.ui.v111
     implementation "androidx.datastore:datastore-preferences:1.0.0"
-
     implementation "androidx.compose.runtime:runtime:1.6.4"
     implementation "androidx.media3:media3-exoplayer:$media3_version"
     implementation "androidx.media3:media3-exoplayer-hls:$media3_version"

@@ -5,6 +5,7 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -13,6 +14,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -25,10 +29,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
@@ -49,17 +57,16 @@ fun CustomTopAppBar(text: String, onBackClicked: () -> Unit) {
     )
 }
 @Composable
-fun LeftAlignedTextButton(navController: NavController, num: Int, uri: String) {
+fun LeftAlignedTextButton(episode: Episode, navController: NavController, num: Int, uri: String) {
     val configuration = LocalConfiguration.current
     val screenHeight = configuration.screenHeightDp.dp
     val buttonHeight = screenHeight / 14
+    val videoQualities = listOf("sd", "hd", "fhd") // Define available video qualities
+    var expanded by remember { mutableStateOf(false) }
+    var selectedQuality by remember { mutableStateOf(videoQualities[0]) } // Default quality
 
     TextButton(
-        onClick = {
-            // Navigate to the lonePlayer screen with the uri as an argument
-            val encodedUri = Uri.encode(uri)
-            navController.navigate("lonePlayer/$encodedUri")
-        },
+        onClick = { expanded = true },
         modifier = Modifier
             .fillMaxWidth()
             .height(buttonHeight),
@@ -71,15 +78,39 @@ fun LeftAlignedTextButton(navController: NavController, num: Int, uri: String) {
                 .padding(horizontal = 16.dp), // Add padding to the Row if needed
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text("Серия: $num")
+            Text("$num Серия")
+            Spacer(Modifier.weight(1f)) // This will push the dropdown to the end of the row
+            DropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false }
+            ) {
+                videoQualities.forEach { quality ->
+                    DropdownMenuItem(onClick = {
+                        selectedQuality = quality
+                        expanded = false
+                        val newUri = when (quality) {
+                            "sd" -> uri+episode.hls.sd
+                            "hd" -> uri+episode.hls.hd
+                            "fhd" -> uri+episode.hls.fhd
+                            else -> uri+episode.hls.sd
+                        }
+                        val encodedUriWithQuality = Uri.encode("$newUri")
+                        navController.navigate("lonePlayer/$encodedUriWithQuality")
+                    }, text = { Text(quality) })
+                }
+            }
         }
     }
 }
 
+
 @RequiresApi(Build.VERSION_CODES.S)
 @Composable
 fun EpisodesList(navController: NavController, onBackClicked: () -> Unit, animeId: Int, uri: Comparable<*>) {
-    MyDynamicTheme {
+    val context = LocalContext.current
+    val (themeSettings, setThemeSettings) = remember { mutableStateOf(PreferencesManager.getSettings(context)) }
+    MyDynamicTheme (
+    ){
         Surface(
             modifier = Modifier.fillMaxSize(),
             color = MaterialTheme.colorScheme.background
@@ -96,7 +127,7 @@ fun EpisodesList(navController: NavController, onBackClicked: () -> Unit, animeI
 
                 LazyColumn {
                     items(episodes) { episode ->
-                        LeftAlignedTextButton(navController, episode.episode, "https://cache.libria.fun"+episode.hls.hd)
+                        LeftAlignedTextButton(episode, navController, episode.episode, "https://cache.libria.fun")
                         // Add more UI elements to display other episode details
                     }
                 }
