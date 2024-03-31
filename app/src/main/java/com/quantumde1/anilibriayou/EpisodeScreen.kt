@@ -13,8 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -49,13 +48,14 @@ fun CustomTopAppBar(text: String, onBackClicked: () -> Unit) {
         navigationIcon = {
             IconButton(onClick = onBackClicked) {
                 Icon(
-                    imageVector = Icons.Filled.ArrowBack,
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = "Back"
                 )
             }
         }
     )
 }
+
 @Composable
 fun LeftAlignedTextButton(episode: Episode, navController: NavController, num: Int, uri: String) {
     val configuration = LocalConfiguration.current
@@ -89,10 +89,10 @@ fun LeftAlignedTextButton(episode: Episode, navController: NavController, num: I
                         selectedQuality = quality
                         expanded = false
                         val newUri = when (quality) {
-                            "sd" -> uri+episode.hls.sd
-                            "hd" -> uri+episode.hls.hd
-                            "fhd" -> uri+episode.hls.fhd
-                            else -> uri+episode.hls.sd
+                            "sd" -> uri + episode.hls.sd
+                            "hd" -> uri + episode.hls.hd
+                            "fhd" -> uri + episode.hls.fhd
+                            else -> uri + episode.hls.sd
                         }
                         val encodedUriWithQuality = Uri.encode("$newUri")
                         navController.navigate("lonePlayer/$encodedUriWithQuality")
@@ -106,11 +106,21 @@ fun LeftAlignedTextButton(episode: Episode, navController: NavController, num: I
 
 @RequiresApi(Build.VERSION_CODES.S)
 @Composable
-fun EpisodesList(navController: NavController, onBackClicked: () -> Unit, animeId: Int, uri: Comparable<*>) {
+fun EpisodesList(
+    navController: NavController,
+    onBackClicked: () -> Unit,
+    animeId: Int,
+    uri: Comparable<*>
+) {
     val context = LocalContext.current
-    val (themeSettings, setThemeSettings) = remember { mutableStateOf(PreferencesManager.getSettings(context)) }
-    MyDynamicTheme (
-    ){
+    val (themeSettings, setThemeSettings) = remember {
+        mutableStateOf(
+            PreferencesManager.getSettings(
+                context
+            )
+        )
+    }
+    MyDynamicTheme {
         Surface(
             modifier = Modifier.fillMaxSize(),
             color = MaterialTheme.colorScheme.background
@@ -127,7 +137,12 @@ fun EpisodesList(navController: NavController, onBackClicked: () -> Unit, animeI
 
                 LazyColumn {
                     items(episodes) { episode ->
-                        LeftAlignedTextButton(episode, navController, episode.episode, "https://cache.libria.fun")
+                        LeftAlignedTextButton(
+                            episode,
+                            navController,
+                            episode.episode,
+                            "https://cache.libria.fun"
+                        )
                         // Add more UI elements to display other episode details
                     }
                 }

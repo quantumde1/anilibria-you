@@ -6,54 +6,52 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Search
 import androidx.navigation.NavController
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.material3.OutlinedTextField
 
-
-@OptIn(ExperimentalLayoutApi::class)
 @RequiresApi(Build.VERSION_CODES.S)
 @Composable
 fun HomeScreen(navController: NavController, viewModel: MainViewModel = viewModel()) {
-    val context = LocalContext.current
     val (selectedTabIndex, setSelectedTabIndex) = remember { mutableStateOf(0) }
     val tabTitles = listOf("Обновленные", "Избранные")
-
     MyDynamicTheme {
         Surface(
             modifier = Modifier.fillMaxSize(),
@@ -73,42 +71,42 @@ fun HomeScreen(navController: NavController, viewModel: MainViewModel = viewMode
 
                 // Content for the selected tab
                 when (selectedTabIndex) {
-                    1 -> FavoritesTabContent() // Replace with your actual favorites content composable
-                    0 -> UpdatesTabContent(viewModel, navController) // Pass the viewModel and navController to the UpdatesTabContent
+                    1 -> FavoritesTabContent()
+                    0 -> UpdatesTabContent(viewModel, navController)
                 }
-
-                // Rest of your HomeScreen content
-                // ...
             }
         }
     }
 }
 
-@Composable
 fun FavoritesTabContent() {
-    // TODO: Implement the UI for the favorites tab
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Text("Favorites content goes here")
-    }
+
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UpdatesTabContent(viewModel: MainViewModel, navController: NavController) {
     val titles by viewModel.titles.observeAsState(initial = emptyList())
     val searchQuery = remember { mutableStateOf("") }
     val keyboardController = LocalSoftwareKeyboardController.current
     val isSearchActive = remember { mutableStateOf(false) }
+    val expanded = remember { mutableStateOf(false) }
+    val showDialog = remember { mutableStateOf(false) }
+    // Example list of genres, this should come from your view model
+    val genres =
+        listOf("Комедия", "Романтика", "Драма", "Приключение", "Школа", "Триллер", "Музыка")
+
+    // State for selected genres, this should also be managed by your view model
+    val selectedGenres = remember { mutableStateListOf<String>() }
 
     Column {
         // Search TextField
-        TextField(
+        OutlinedTextField(
             value = searchQuery.value,
             onValueChange = {
                 searchQuery.value = it
                 isSearchActive.value = it.isNotEmpty()
-                if (it.isNotEmpty()) {
-                    viewModel.searchTitles(it) // Perform search with the current query
-                }
+                viewModel.searchTitles(it) // Perform search with the current query or reset if empty
             },
             label = { Text("Поиск") },
             leadingIcon = {
@@ -118,20 +116,12 @@ fun UpdatesTabContent(viewModel: MainViewModel, navController: NavController) {
                 )
             },
             trailingIcon = {
-                if (isSearchActive.value) {
-                    IconButton(onClick = {
-                        // Handle the back action
-                        isSearchActive.value = false
-                        searchQuery.value = ""
-                        keyboardController?.hide() // Dismiss the keyboard
-                        viewModel.searchTitles("") // Reset search
-                    }) {
+                    IconButton(onClick = { showDialog.value = true }) {
                         Icon(
-                            imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "Назад"
+                            imageVector = Icons.Default.MoreVert,
+                            contentDescription = "Фильтры"
                         )
                     }
-                }
             },
             modifier = Modifier
                 .fillMaxWidth()
@@ -141,13 +131,60 @@ fun UpdatesTabContent(viewModel: MainViewModel, navController: NavController) {
                 viewModel.searchTitles(searchQuery.value)
                 isSearchActive.value = true
                 keyboardController?.hide() // Dismiss the keyboard
-            })
+            }),
+            singleLine = true,
+            colors = TextFieldDefaults.outlinedTextFieldColors() // Use default Material 3 colors
         )
-
+        if (showDialog.value) {
+            AlertDialog(
+                onDismissRequest = { showDialog.value = false },
+                title = { Text(text = "Выберите жанры") },
+                text = {
+                    // List of checkboxes for each genre
+                    Column {
+                        genres.forEach { genre ->
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Checkbox(
+                                    checked = selectedGenres.contains(genre),
+                                    onCheckedChange = { isSelected ->
+                                        if (isSelected) {
+                                            selectedGenres.add(genre)
+                                        } else {
+                                            selectedGenres.remove(genre)
+                                        }
+                                    }
+                                )
+                                Text(text = genre, modifier = Modifier.padding(start = 8.dp))
+                            }
+                        }
+                    }
+                },
+                confirmButton = {
+                    Button(
+                        onClick = {
+                            // Update the search with the new list of selected genres
+                            viewModel.searchTitlesWithGenres(searchQuery.value, selectedGenres)
+                            showDialog.value = false
+                        }
+                    ) {
+                        Text("Далее")
+                    }
+                },
+                dismissButton = {
+                    Button(onClick = { showDialog.value = false }) {
+                        Text("Отмена")
+                    }
+                }
+            )
+        }
         // Content based on search results or the full list
         TitleListContent(titles, navController)
     }
 }
+
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun TitleListContent(titles: List<Title>, navController: NavController) {

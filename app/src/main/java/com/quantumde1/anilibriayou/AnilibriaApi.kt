@@ -10,14 +10,15 @@ import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
-import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface AnilibriaApiService {
     @GET("api/v3/title/updates")
     suspend fun getTitleList(@Query("items_per_page") itemsPerPage: Int): Response<TitleListResponse>
+
     @GET("api/v3/title/search")
     suspend fun searchTitles(@Query("search") searchQuery: String): Response<TitleListResponse>
+
     @GET("api/v3/title")
     suspend fun getAnimeDetails(@Query("id") id: Int): Response<Title>
 }
@@ -36,6 +37,7 @@ class MainViewModel : ViewModel() {
     init {
         fetchTitles(30)
     }
+
     fun fetchEpisodes(animeId: Int) {
         viewModelScope.launch {
             try {
@@ -73,10 +75,22 @@ class MainViewModel : ViewModel() {
             }
         }
     }
+
     private val _episodes = MutableLiveData<List<Episode>>()
     val episodes: LiveData<List<Episode>> = _episodes
 
     // ... existing init and fetchTitles functions
+    fun searchTitlesWithGenres(searchQuery: String, selectedGenres: List<String>) {
+        viewModelScope.launch {
+            try {
+                val genreFilter = selectedGenres.joinToString(",")
+                val response = apiService.searchTitles("$searchQuery&genres=$genreFilter")
+                // ... handle the response as before
+            } catch (e: Exception) {
+                // ... handle the exception as before
+            }
+        }
+    }
 
     fun searchTitles(searchQuery: String) {
         viewModelScope.launch {

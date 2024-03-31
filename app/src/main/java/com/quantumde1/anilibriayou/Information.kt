@@ -1,7 +1,5 @@
 package com.quantumde1.anilibriayou
 
-import com.google.gson.annotations.SerializedName
-
 data class TitleListResponse(
     val list: List<Title>
 )
@@ -36,27 +34,17 @@ data class Title(
     val description: String,
     val season: Season,
     val list: Map<String, Episode>,
-    @SerializedName("type")
     val type: Type,
     val player: Player?,
-
+    var isFavorite: Boolean = false
     // ... include other fields as necessary
 )
 
-data class Type (
-    @SerializedName("full_string")
+data class Type(
     val fullString: String,
-
-    @SerializedName("code")
     val code: Int,
-
-    @SerializedName("string")
     val string: String,
-
-    @SerializedName("episodes")
     val episodes: Int,
-
-    @SerializedName("length")
     val length: Int
 )
 
@@ -84,6 +72,7 @@ data class Poster(
     val url: String,
     val raw_base64_file: String?
 )
+
 data class Player(
     val list: Map<String, Episode>?
 )

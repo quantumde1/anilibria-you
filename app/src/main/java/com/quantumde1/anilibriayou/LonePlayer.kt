@@ -98,13 +98,14 @@ fun LonePlayer(enuri: String) {
         }
     }
 
-    AndroidView({ context ->
-        PlayerView(context).apply {
-            player = exoPlayer
-            setBackgroundColor(Color.Black.toArgb())
-            keepScreenOn = true
-        }
-    }, modifier = Modifier.fillMaxSize()
+    AndroidView(
+        { context ->
+            PlayerView(context).apply {
+                player = exoPlayer
+                setBackgroundColor(Color.Black.toArgb())
+                keepScreenOn = true
+            }
+        }, modifier = Modifier.fillMaxSize()
     )
 
     DisposableEffect(Unit) {

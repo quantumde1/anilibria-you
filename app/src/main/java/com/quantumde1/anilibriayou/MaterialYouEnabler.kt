@@ -2,11 +2,8 @@ package com.quantumde1.anilibriayou
 
 import android.content.Context
 import android.content.Intent
-import android.content.res.Configuration
 import android.net.Uri
 import android.os.Build
-import androidx.annotation.RequiresApi
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -17,7 +14,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.Typography
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.dynamicDarkColorScheme
@@ -48,7 +44,9 @@ fun OpenUrlButton(text: String, url: String) {
         Text(text)
     }
 }
+
 val LocalThemeSettings = compositionLocalOf { Pair(false, false) }
+
 object PreferencesManager {
     private const val PREFERENCES_FILE_KEY = "com.quantumde1.anilibriayou.PREFERENCE_FILE_KEY"
     private const val DARK_THEME_KEY = "DARK_THEME_KEY"
@@ -70,6 +68,7 @@ object PreferencesManager {
         return Pair(darkTheme, dynamicColors)
     }
 }
+
 @Composable
 fun MyDynamicTheme(content: @Composable () -> Unit) {
     val context = LocalContext.current
@@ -79,12 +78,15 @@ fun MyDynamicTheme(content: @Composable () -> Unit) {
         dynamicColorsEnabled && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && darkThemeEnabled -> {
             dynamicDarkColorScheme(context)
         }
+
         dynamicColorsEnabled && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !darkThemeEnabled -> {
             dynamicLightColorScheme(context)
         }
+
         darkThemeEnabled -> {
             darkColorScheme() // Your dark color scheme when dynamic colors are disabled
         }
+
         else -> {
             lightColorScheme() // Your light color scheme when dynamic colors are disabled
         }
@@ -96,6 +98,7 @@ fun MyDynamicTheme(content: @Composable () -> Unit) {
         content = content
     )
 }
+
 @Composable
 fun SettingsScreen(context: Context, onThemeChange: (Boolean, Boolean) -> Unit) {
     val context = LocalContext.current
@@ -145,7 +148,10 @@ fun SettingsScreen(context: Context, onThemeChange: (Boolean, Boolean) -> Unit) 
                 Spacer(modifier = Modifier.padding(16.dp))
                 Text(text = "Сделано quantumde1, никакие права не защищены.")
                 Spacer(modifier = Modifier.padding(4.dp))
-                OpenUrlButton(text = "Matrix", url = "https://matrix.to/#/@quantumde1:underlevel.ddns.net")
+                OpenUrlButton(
+                    text = "Matrix",
+                    url = "https://matrix.to/#/@quantumde1:underlevel.ddns.net"
+                )
                 Spacer(modifier = Modifier.padding(4.dp))
                 OpenUrlButton(text = "Telegram", url = "https://t.me/quantumde1")
             }
