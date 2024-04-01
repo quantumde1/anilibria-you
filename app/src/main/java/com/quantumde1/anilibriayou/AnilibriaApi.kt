@@ -8,6 +8,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import retrofit2.Response
@@ -98,6 +99,28 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             }
         }
     }
+
+    private val _favoriteTitles = MutableLiveData<List<Title>>()
+    val favoriteTitles: LiveData<List<Title>> = _favoriteTitles
+
+    // Функция для получения деталей избранных аниме
+    fun fetchFavoriteTitles() {
+        viewModelScope.launch {
+            val favoriteIds = dataStoreRepository.favoriteAnimeTitleIds.first() // Получаем избранные ID
+            val titlesList = mutableListOf<Title>()
+            favoriteIds.forEach { id ->
+                try {
+                    val response = apiService.getAnimeDetails(id)
+                    if (response.isSuccessful && response.body() != null) {
+                        titlesList.add(response.body()!!)
+                    }
+                } catch (e: Exception) {
+                    Log.e("MainViewModel", "Error fetching anime details for id $id", e)
+                }
+            }
+            _favoriteTitles.postValue(titlesList) // Обновляем LiveData с избранными аниме
+        }
+    }
     // Function to save a title ID to favorites
     fun saveFavoriteAnimeTitleId(id: Int) {
         viewModelScope.launch {
@@ -114,6 +137,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     init {
         fetchTitles(30)
         fetchFavoriteTitleIds()
+        fetchFavoriteTitles()
     }
 
     // Function to fetch favorite titles from DataStore

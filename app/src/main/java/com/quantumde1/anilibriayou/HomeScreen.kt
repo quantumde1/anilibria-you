@@ -1,6 +1,7 @@
 package com.quantumde1.anilibriayou
 
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -182,7 +183,7 @@ fun HomeScreen(navController: NavController, viewModel: MainViewModel = viewMode
 
                     // Content for the selected tab
                     when (selectedTabIndex) {
-                        1 -> FavoritesTabContent(titles = titles, navController)
+                        1 -> FavoritesTabContent(navController)
                         0 -> UpdatesTabContent(viewModel, navController)
                     }
                 }
@@ -193,30 +194,21 @@ fun HomeScreen(navController: NavController, viewModel: MainViewModel = viewMode
 
 
 
-@OptIn(ExperimentalLayoutApi::class)
-@Composable
-fun FavoritesTabContent(titles: List<Title>, navController: NavController) {
-    val dataStoreRepository = LocalDataStoreRepository.current
-    val favoriteTitleIds by dataStoreRepository.favoriteAnimeTitleIds.collectAsState(initial = setOf())
 
-    // Filter the full list of titles to include only the favorites
-    val favoriteTitles = titles.filter { it.id in favoriteTitleIds }
+@Composable
+fun FavoritesTabContent(navController: NavController, viewModel: MainViewModel = viewModel()) {
+    val favoriteTitles by viewModel.favoriteTitles.observeAsState(initial = emptyList())
 
     if (favoriteTitles.isEmpty()) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            Text("No favorite titles added")
+            Text("Нет добавленных в избранное аниме")
         }
     } else {
-        // Title List Screen
-        FlowRow(
-            modifier = Modifier.verticalScroll(rememberScrollState())
-        ) {
-            favoriteTitles.forEach { title ->
-                ImageCard(navController, title)
-            }
-        }
+        TitleFavoriteListContent(titles = favoriteTitles, navController = navController)
     }
 }
+
+
 
 
 
@@ -224,9 +216,6 @@ fun FavoritesTabContent(titles: List<Title>, navController: NavController) {
 @Composable
 fun UpdatesTabContent(viewModel: MainViewModel, navController: NavController) {
     val titles by viewModel.titles.observeAsState(initial = emptyList())
-    val searchQuery = remember { mutableStateOf("") }
-    val keyboardController = LocalSoftwareKeyboardController.current
-    val isSearchActive = remember { mutableStateOf(false) }
     remember { mutableStateOf(false) }
 
     Column {
@@ -249,6 +238,31 @@ fun TitleListContent(titles: List<Title>, navController: NavController) {
             modifier = Modifier.verticalScroll(rememberScrollState())
         ) {
             titles.forEach { title ->
+                ImageCard(navController, title)
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+fun TitleFavoriteListContent(titles: List<Title>, navController: NavController) {
+    val dataStoreRepository = LocalDataStoreRepository.current
+    val favoriteTitleIds by dataStoreRepository.favoriteAnimeTitleIds.collectAsState(initial = setOf())
+
+    // Фильтруем полный список аниме, чтобы включить только избранные
+    val favoriteTitles = titles.filter { it.id in favoriteTitleIds }
+
+    if (favoriteTitles.isEmpty()) {
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            Text("No titles available")
+        }
+    } else {
+        // Title List Screen
+        FlowRow(
+            modifier = Modifier.verticalScroll(rememberScrollState())
+        ) {
+            favoriteTitles.forEach { title ->
                 ImageCard(navController, title)
             }
         }
