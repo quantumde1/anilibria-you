@@ -63,9 +63,7 @@ fun LonePlayer(enuri: String) {
                 coroutineScope.launch {
                     delay(5000) // 5-second delay
                     activity?.window?.let { window ->
-                        WindowInsetsControllerCompat(window, window.decorView).let { controller ->
-                            controller.hide(WindowInsetsCompat.Type.systemBars())
-                        }
+                        WindowInsetsControllerCompat(window, window.decorView).hide(WindowInsetsCompat.Type.systemBars())
                     }
                 }
             }
@@ -81,9 +79,7 @@ fun LonePlayer(enuri: String) {
 
         onDispose {
             activity?.window?.let { window ->
-                WindowInsetsControllerCompat(window, window.decorView).let { controller ->
-                    controller.show(WindowInsetsCompat.Type.systemBars())
-                }
+                WindowInsetsControllerCompat(window, window.decorView).show(WindowInsetsCompat.Type.systemBars())
             }
             activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
         }

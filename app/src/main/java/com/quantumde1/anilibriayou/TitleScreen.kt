@@ -21,25 +21,29 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
@@ -49,13 +53,17 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import coil.compose.rememberImagePainter
+import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 // AnimeTitleState.kt
 sealed class AnimeTitleState {
-    object Loading : AnimeTitleState()
+    data object Loading : AnimeTitleState()
     data class Success(val title: Title) : AnimeTitleState()
     data class Failure(val exception: Exception) : AnimeTitleState()
 }
@@ -194,7 +202,7 @@ private fun AnimeDetailsRow(navController: NavController, title: Title) {
         ) {
             AnimeDetailsCard(title)
             AnimeDetailsText(title)
-            AnimeDetailsButtons(navController, title.id)
+            AnimeDetailsButtons(navController, title)
         }
     }
 }
@@ -224,8 +232,9 @@ private fun AnimeDetailsCard(title: Title) {
         ) {
             val imageUrl = "https://static.wwnd.space/${title.posters.original.url}"
             Image(
-                painter = rememberImagePainter(imageUrl,
-                    builder = {
+                painter = // Replace with your error drawable resource
+                rememberAsyncImagePainter(
+                    ImageRequest.Builder(LocalContext.current).data(imageUrl).apply(block = fun ImageRequest.Builder.() {
                         listener(onError = { _, throwable ->
                             Log.e(
                                 "ImageCard",
@@ -233,7 +242,8 @@ private fun AnimeDetailsCard(title: Title) {
                                 throwable.throwable
                             )
                         }) // Replace with your error drawable resource
-                    }), // Use Coil to load the image from the URL
+                    }).build()
+                ), // Use Coil to load the image from the URL
                 contentDescription = "",
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxSize()
@@ -260,34 +270,60 @@ private fun AnimeDetailsText(title: Title) {
             Text(
                 text = "Серий: ${title.type.episodes}",
             )
+            Spacer(modifier = Modifier.height(4.dp))
         }
     }
 }
 
-
+val LocalDataStoreRepository = compositionLocalOf<DataStoreRepository> {
+    error("DataStoreRepository not provided")
+}
 @Composable
-private fun AnimeDetailsButtons(navController: NavController, id: Int) {
+private fun AnimeDetailsButtons(navController: NavController, title: Title) {
+    val dataStoreRepository = LocalDataStoreRepository.current
+    val context = LocalContext.current
+    // Track whether the title is a favorite
+    val isFavorite = remember { mutableStateOf(title.isFavorite) }
+
     Row(
         horizontalArrangement = Arrangement.Center,
         modifier = Modifier.fillMaxWidth()
     ) {
         Button(
             onClick = {
-                navController.navigate("episodesList/$id")
+                navController.navigate("episodesList/${title.id}")
             }
         ) {
             Text(text = "Смотреть")
         }
         Spacer(modifier = Modifier.width(8.dp)) // Add spacing between buttons
-        Button(
+
+        // Use IconButton with a heart icon
+        IconButton(
             onClick = {
-                // Implement the logic to add to favorites
+                // Toggle the favorite status
+                isFavorite.value = !isFavorite.value
+                title.isFavorite = isFavorite.value
+                CoroutineScope(Dispatchers.IO).launch {
+                // Call the appropriate function based on whether the title is a favorite
+                    if (isFavorite.value) {
+                        dataStoreRepository.saveFavoriteAnimeTitleId(title.id)
+                    } else {
+                        dataStoreRepository.removeFavoriteAnimeTitleId(title.id)
+                }
+                }
             }
         ) {
-            Text(text = "В избранное")
+            Icon(
+                imageVector = if (isFavorite.value) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
+                contentDescription = if (isFavorite.value) "Удалить из избранного" else "Добавить в избранное",
+                tint = if (isFavorite.value) Color.Red else Color.Gray
+            )
         }
     }
 }
+
+
 
 
 

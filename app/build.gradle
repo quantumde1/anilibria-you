@@ -68,6 +68,8 @@ dependencies {
     implementation "androidx.media3:media3-datasource:$media3_version"
     // Common functionality used across multiple media libraries
     implementation "androidx.media3:media3-common:$media3_version"
+    implementation libs.androidx.datastore.preferences
+    implementation "androidx.lifecycle:lifecycle-livedata-ktx:2.7.0"
 
     implementation libs.material3
     implementation "androidx.compose.runtime:runtime-livedata"

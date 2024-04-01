@@ -1,6 +1,5 @@
 package com.quantumde1.anilibriayou
 
-import android.net.Uri
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.material.icons.Icons
@@ -19,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavController
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
 
 @RequiresApi(Build.VERSION_CODES.S)
@@ -28,7 +28,7 @@ fun MyBottomBar(
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
-    val (themeSettings, setThemeSettings) = remember {
+    val (_, _) = remember {
         mutableStateOf(
             PreferencesManager.getSettings(
                 context
@@ -53,12 +53,13 @@ fun MyBottomBar(
                     label = { Text(item.title) },
                     selected = selected,
                     onClick = {
-                        when (item.route) {
-                            "home" -> navController.navigate("home") {
-                                // Pop up to the start destination of the graph to
-                                // avoid building up a large stack of destinations
-                                // on the back stack as users select items
-                                popUpTo(navController.graph.startDestinationId) {
+                        // Only navigate if the selected route is not the current route
+                        if (currentRoute != item.route) {
+                            navController.navigate(item.route) {
+                                // This will clear the back stack until the 'home' destination is reached,
+                                // and then it will navigate to the 'home' destination.
+                                // If 'home' is already at the top of the back stack, it will not do anything.
+                                popUpTo(navController.graph.findStartDestination().id) {
                                     saveState = true
                                 }
                                 // Avoid multiple copies of the same destination when
@@ -67,14 +68,8 @@ fun MyBottomBar(
                                 // Restore state when reselecting a previously selected item
                                 restoreState = true
                             }
-
-                            "settings" -> navController.navigate("settings")
-                            "profile" -> navController.navigate("profile")
-                            // For other routes, simply navigate up
-                            else -> navController.navigateUp()
                         }
-                    }
-                )
+                    })
             }
         }
     }

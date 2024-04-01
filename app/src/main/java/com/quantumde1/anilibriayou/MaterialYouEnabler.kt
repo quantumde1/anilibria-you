@@ -100,7 +100,7 @@ fun MyDynamicTheme(content: @Composable () -> Unit) {
 }
 
 @Composable
-fun SettingsScreen(context: Context, onThemeChange: (Boolean, Boolean) -> Unit) {
+fun SettingsScreen(onThemeChange: (Boolean, Boolean) -> Unit) {
     val context = LocalContext.current
     val (themeSettings, setThemeSettings) = remember {
         mutableStateOf(

@@ -21,11 +21,13 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import coil.compose.rememberImagePainter
+import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
 
 @Composable
 fun ImageCard(navController: NavController, title: Title) {
@@ -60,12 +62,14 @@ fun ImageCard(navController: NavController, title: Title) {
 
         ) {
             Image(
-                painter = rememberImagePainter(imageUrl,
-                    builder = {
+                painter = // Replace with your error drawable resource
+                rememberAsyncImagePainter(
+                    ImageRequest.Builder(LocalContext.current).data(imageUrl).apply(block = fun ImageRequest.Builder.() {
                         listener(onError = { _, throwable ->
                             Log.e("ImageCard", "Error loading image", throwable.throwable)
                         })// Replace with your error drawable resource
-                    }), // Use Coil to load the image from the URL
+                    }).build()
+                ), // Use Coil to load the image from the URL
                 contentDescription = truncatedText,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxSize()

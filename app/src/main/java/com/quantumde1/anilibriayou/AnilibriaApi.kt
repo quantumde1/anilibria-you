@@ -1,16 +1,21 @@
 package com.quantumde1.anilibriayou
 
+import android.app.Application
 import android.util.Log
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
 import retrofit2.http.Query
+
 
 interface AnilibriaApiService {
     @GET("api/v3/title/updates")
@@ -24,7 +29,10 @@ interface AnilibriaApiService {
 }
 
 
-class MainViewModel : ViewModel() {
+class MainViewModel(application: Application) : AndroidViewModel(application) {
+    private val context = getApplication<Application>().applicationContext
+    private val dataStoreRepository = DataStoreRepository(context)
+
     private val _titles = MutableLiveData<List<Title>>()
     val titles: LiveData<List<Title>> = _titles
 
@@ -78,7 +86,37 @@ class MainViewModel : ViewModel() {
 
     private val _episodes = MutableLiveData<List<Episode>>()
     val episodes: LiveData<List<Episode>> = _episodes
+    // LiveData to hold the favorite titles
+    private val _favoriteTitleIds = MutableLiveData<Set<Int>>()
+    val favoriteTitleIds: LiveData<Set<Int>> = _favoriteTitleIds
 
+    // Function to fetch favorite title IDs
+    private fun fetchFavoriteTitleIds() {
+        viewModelScope.launch {
+            dataStoreRepository.favoriteAnimeTitleIds.collect { favoriteIds ->
+                _favoriteTitleIds.postValue(favoriteIds)
+            }
+        }
+    }
+    // Function to save a title ID to favorites
+    fun saveFavoriteAnimeTitleId(id: Int) {
+        viewModelScope.launch {
+            dataStoreRepository.saveFavoriteAnimeTitleId(id)
+        }
+    }
+
+    // Function to remove a title ID from favorites
+    fun removeFavoriteAnimeTitleId(id: Int) {
+        viewModelScope.launch {
+            dataStoreRepository.removeFavoriteAnimeTitleId(id)
+        }
+    }
+    init {
+        fetchTitles(30)
+        fetchFavoriteTitleIds()
+    }
+
+    // Function to fetch favorite titles from DataStore
     // ... existing init and fetchTitles functions
     fun searchTitlesWithGenres(searchQuery: String, selectedGenres: List<String>) {
         viewModelScope.launch {
