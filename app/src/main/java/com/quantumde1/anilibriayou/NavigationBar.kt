@@ -27,25 +27,25 @@ fun MyBottomBar(
     navController: NavController,
     modifier: Modifier = Modifier
 ) {
-    val context = LocalContext.current
-    val (_, _) = remember {
-        mutableStateOf(
-            PreferencesManager.getSettings(
-                context
-            )
-        )
-    }
+    // If you don't need the settings, you can remove this
+    // val settings = PreferencesManager.getSettings(context)
 
     MyDynamicTheme {
-        val items = listOf(
-            NavigationItem("Релизы", Icons.Filled.Home, "home"),
-            NavigationItem("Профиль", Icons.Filled.Person, "profile"),
-            NavigationItem("Настройки", Icons.Filled.Settings, "settings")
-        )
+        val items = remember {
+            listOf(
+                NavigationItem("Релизы", Icons.Filled.Home, "home"),
+                NavigationItem("Профиль", Icons.Filled.Person, "profile"),
+                NavigationItem("Настройки", Icons.Filled.Settings, "settings")
+            )
 
+        }
+        MyDynamicTheme {
+            SetSystemBarsColor()
+        }
         NavigationBar(modifier = modifier) {
             val navBackStackEntry by navController.currentBackStackEntryAsState()
             val currentRoute = navBackStackEntry?.destination?.route
+
             items.forEach { item ->
                 val selected = item.route == currentRoute
                 NavigationBarItem(
@@ -53,24 +53,22 @@ fun MyBottomBar(
                     label = { Text(item.title) },
                     selected = selected,
                     onClick = {
-                        // Only navigate if the selected route is not the current route
-                        if (currentRoute != item.route) {
-                            navController.navigate(item.route) {
-                                // This will clear the back stack until the 'home' destination is reached,
-                                // and then it will navigate to the 'home' destination.
-                                // If 'home' is already at the top of the back stack, it will not do anything.
-                                popUpTo(navController.graph.findStartDestination().id) {
-                                    saveState = true
-                                }
-                                // Avoid multiple copies of the same destination when
-                                // reselecting the same item
-                                launchSingleTop = true
-                                // Restore state when reselecting a previously selected item
-                                restoreState = true
-                            }
-                        }
-                    })
+                        navigateToDestination(navController, item.route, currentRoute)
+                    }
+                )
             }
+        }
+    }
+}
+
+private fun navigateToDestination(navController: NavController, route: String, currentRoute: String?) {
+    if (currentRoute != route) {
+        navController.navigate(route) {
+            popUpTo(navController.graph.findStartDestination().id) {
+                saveState = true
+            }
+            launchSingleTop = true
+            restoreState = true
         }
     }
 }

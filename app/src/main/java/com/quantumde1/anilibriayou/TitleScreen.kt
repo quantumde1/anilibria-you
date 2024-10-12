@@ -5,17 +5,7 @@ import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -23,28 +13,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
-import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.LocalContentColor
-import androidx.compose.material3.LocalTextStyle
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.compositionLocalOf
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
@@ -63,7 +36,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 // AnimeTitleState.kt
 sealed class AnimeTitleState {
-    data object Loading : AnimeTitleState()
+    object Loading : AnimeTitleState()
     data class Success(val title: Title) : AnimeTitleState()
     data class Failure(val exception: Exception) : AnimeTitleState()
 }
@@ -80,6 +53,7 @@ suspend fun loadAnimeTitle(id: Int): Title? {
         val response = apiService.getAnimeDetails(id)
         response.body()
     } catch (e: Exception) {
+        Log.e("ApiService", "Error loading anime title", e)
         null
     }
 }
@@ -94,36 +68,24 @@ fun FoldableText(text: String, maxLength: Int = 200) {
         modifier = Modifier
             .fillMaxWidth()
             .clickable { isFolded = !isFolded },
-        shape = RectangleShape
+        shape = RoundedCornerShape(8.dp)
     ) {
         Column {
-            Spacer(modifier = Modifier.width(8.dp))
             FoldableTextHeader()
-            Spacer(modifier = Modifier.padding(1.dp))
             Text(
                 text = displayText,
                 style = MaterialTheme.typography.bodyMedium.copy(color = LocalContentColor.current),
                 modifier = Modifier.padding(16.dp)
             )
-            Spacer(modifier = Modifier.padding(3.dp))
         }
     }
 }
 
 @Composable
 private fun FoldableTextHeader() {
-    Row(
-        modifier = Modifier.padding(all = 3.dp)
-    ) {
-        Icon(
-            imageVector = Icons.Default.ArrowDropDown,
-            contentDescription = "Toggle Text",
-            modifier = Modifier.size(24.dp)
-        )
-        Text(
-            text = "Описание",
-            style = LocalTextStyle.current.copy(fontSize = 19.sp)
-        )
+    Row(modifier = Modifier.padding(3.dp)) {
+        Icon(imageVector = Icons.Default.ArrowDropDown, contentDescription = "Toggle Text", modifier = Modifier.size(24.dp))
+        Text(text = "Описание", style = MaterialTheme.typography.titleMedium)
     }
 }
 
@@ -132,13 +94,10 @@ private fun FoldableTextHeader() {
 @Composable
 fun AnimeDetailsScreen(navController: NavController, id: Int) {
     MyDynamicTheme {
-        Surface(
-            modifier = Modifier.fillMaxSize(),
-            color = MaterialTheme.colorScheme.background
-        ) {
+        Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
             var animeTitleState by remember { mutableStateOf<AnimeTitleState>(AnimeTitleState.Loading) }
 
-            LaunchedEffect(key1 = id) {
+            LaunchedEffect(id) {
                 animeTitleState = try {
                     val title = loadAnimeTitle(id)
                     title?.let { AnimeTitleState.Success(it) } ?: AnimeTitleState.Failure(Exception("Title is null"))
@@ -155,7 +114,7 @@ fun AnimeDetailsScreen(navController: NavController, id: Int) {
 @Composable
 private fun AnimeDetailsContent(navController: NavController, animeTitleState: AnimeTitleState) {
     when (animeTitleState) {
-        is AnimeTitleState.Loading -> LoadingIndicator()
+        is AnimeTitleState.Loading -> LoadingIndicator() // Handle the Loading state
         is AnimeTitleState.Success -> AnimeDetailsSuccessContent(navController, animeTitleState.title)
         is AnimeTitleState.Failure -> ErrorContent(animeTitleState.exception)
     }
@@ -174,18 +133,10 @@ private fun LoadingIndicator() {
 @Composable
 private fun AnimeDetailsSuccessContent(navController: NavController, title: Title) {
     Column {
-        val truncatedText = if (title.names.ru.length > 20) {
-            title.names.ru.take(20) + "..."
-        } else {
-            title.names.ru
-        }
-        CustomTopAppBar(
-            truncatedText,
-            onBackClicked = { navController.navigateUp() })
+        val truncatedText = title.names.ru.take(20) + if (title.names.ru.length > 20) "..." else ""
+        CustomTopAppBar(truncatedText, onBackClicked = { navController.navigateUp() })
 
-        Column(
-            modifier = Modifier.verticalScroll(rememberScrollState())
-        ) {
+        Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
             AnimeDetailsRow(navController, title)
             FoldableText(text = title.description)
         }
@@ -197,7 +148,7 @@ private fun AnimeDetailsRow(navController: NavController, title: Title) {
     Row(modifier = Modifier.fillMaxWidth()) {
         Column(
             modifier = Modifier
-                .fillMaxSize() // Fill the parent's size
+                .fillMaxSize()
                 .padding(16.dp)
         ) {
             AnimeDetailsCard(title)
@@ -211,40 +162,30 @@ private fun AnimeDetailsRow(navController: NavController, title: Title) {
 private fun AnimeDetailsCard(title: Title) {
     Box(
         modifier = Modifier
-            .fillMaxSize() // Fill the parent's size
+            .fillMaxSize()
             .padding(16.dp)
     ) {
         val configuration = LocalConfiguration.current
-        val screenWidth = configuration.screenWidthDp.dp
-        val screenHeight = configuration.screenHeightDp.dp
-        val cardWidth = screenWidth * 0.600f // 50% of screen width
-        val cardHeight = screenHeight * 0.45f // 37.5% of screen height, which is 3/8
+        val cardWidth = configuration.screenWidthDp.dp * 0.6f
+        val cardHeight = configuration.screenHeightDp.dp * 0.45f
 
         Card(
             modifier = Modifier
                 .width(cardWidth)
                 .height(cardHeight)
-                .align(Alignment.Center), // Center the card within the Box
+                .align(Alignment.Center),
             shape = RoundedCornerShape(15.dp),
-            elevation = CardDefaults.cardElevation(
-                defaultElevation = 5.dp
-            )
+            elevation = CardDefaults.cardElevation(defaultElevation = 5.dp)
         ) {
             val imageUrl = "https://static.wwnd.space/${title.posters.original.url}"
             Image(
-                painter = // Replace with your error drawable resource
-                rememberAsyncImagePainter(
-                    ImageRequest.Builder(LocalContext.current).data(imageUrl).apply(block = fun ImageRequest.Builder.() {
+                painter = rememberAsyncImagePainter(
+                    ImageRequest.Builder(LocalContext.current).data(imageUrl).apply {
                         listener(onError = { _, throwable ->
-                            Log.e(
-                                "ImageCard",
-                                "Error loading image",
-                                throwable.throwable
-                            )
-                        }) // Replace with your error drawable resource
-                    }).build()
-                ), // Use Coil to load the image from the URL
-                contentDescription = "",
+                        })
+                    }.build()
+                ),
+                contentDescription = null,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxSize()
             )
@@ -259,17 +200,11 @@ private fun AnimeDetailsText(title: Title) {
         modifier = Modifier.fillMaxSize()
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(
-                text = title.names.ru, fontWeight = FontWeight.Bold, fontSize = 24.sp,
-                )
+            Text(text = title.names.ru, fontWeight = FontWeight.Bold, fontSize = 24.sp)
             Spacer(modifier = Modifier.height(4.dp))
-            Text(
-                text = "Сезон: ${title.season.string}, дата выхода: ${title.season.year}",
-            )
+            Text(text = "Сезон: ${title.season.string}, дата выхода: ${title.season.year}")
             Spacer(modifier = Modifier.height(4.dp))
-            Text(
-                text = "Серий: ${title.type.episodes}",
-            )
+            Text(text = "Серий: ${title.type.episodes}")
             Spacer(modifier = Modifier.height(4.dp))
         }
     }
@@ -278,42 +213,33 @@ private fun AnimeDetailsText(title: Title) {
 val LocalDataStoreRepository = compositionLocalOf<DataStoreRepository> {
     error("DataStoreRepository not provided")
 }
+
 @Composable
 private fun AnimeDetailsButtons(navController: NavController, title: Title) {
     val dataStoreRepository = LocalDataStoreRepository.current
     val context = LocalContext.current
-    // Track whether the title is a favorite
     val isFavorite = remember { mutableStateOf(title.isFavorite) }
 
     Row(
         horizontalArrangement = Arrangement.Center,
         modifier = Modifier.fillMaxWidth()
     ) {
-        Button(
-            onClick = {
-                navController.navigate("episodesList/${title.id}")
-            }
-        ) {
+        Button(onClick = { navController.navigate("episodesList/${title.id}") }) {
             Text(text = "Смотреть")
         }
-        Spacer(modifier = Modifier.width(8.dp)) // Add spacing between buttons
+        Spacer(modifier = Modifier.width(8.dp))
 
-        // Use IconButton with a heart icon
-        IconButton(
-            onClick = {
-                // Toggle the favorite status
-                isFavorite.value = !isFavorite.value
-                title.isFavorite = isFavorite.value
-                CoroutineScope(Dispatchers.IO).launch {
-                // Call the appropriate function based on whether the title is a favorite
-                    if (isFavorite.value) {
-                        dataStoreRepository.saveFavoriteAnimeTitleId(title.id)
-                    } else {
-                        dataStoreRepository.removeFavoriteAnimeTitleId(title.id)
-                }
+        IconButton(onClick = {
+            isFavorite.value = !isFavorite.value
+            title.isFavorite = isFavorite.value
+            CoroutineScope(Dispatchers.IO).launch {
+                if (isFavorite.value) {
+                    dataStoreRepository.saveFavoriteAnimeTitleId(title.id)
+                } else {
+                    dataStoreRepository.removeFavoriteAnimeTitleId(title.id)
                 }
             }
-        ) {
+        }) {
             Icon(
                 imageVector = if (isFavorite.value) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
                 contentDescription = if (isFavorite.value) "Удалить из избранного" else "Добавить в избранное",
@@ -322,10 +248,6 @@ private fun AnimeDetailsButtons(navController: NavController, title: Title) {
         }
     }
 }
-
-
-
-
 
 @Composable
 private fun ErrorContent(exception: Exception) {
