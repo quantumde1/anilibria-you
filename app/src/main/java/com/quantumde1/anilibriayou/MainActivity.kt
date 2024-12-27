@@ -6,6 +6,9 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.layout.Box
@@ -88,11 +91,17 @@ class MainActivity : ComponentActivity() {
                                             slideInHorizontally(
                                                 initialOffsetX = { it },
                                                 animationSpec = tween(durationMillis = 300)
+                                            ) + scaleIn(
+                                                initialScale = 0.9f,
+                                                animationSpec = tween(durationMillis = 300)
                                             )
                                         },
                                         exitTransition = {
-                                            slideOutHorizontally(
+                                            fadeOut(animationSpec = tween(durationMillis = 300)) + slideOutHorizontally(
                                                 targetOffsetX = { it },
+                                                animationSpec = tween(durationMillis = 300)
+                                            ) + scaleOut(
+                                                targetScale = 0.9f, // End slightly smaller
                                                 animationSpec = tween(durationMillis = 300)
                                             )
                                         }
@@ -103,11 +112,17 @@ class MainActivity : ComponentActivity() {
                                             slideInHorizontally(
                                                 initialOffsetX = { it },
                                                 animationSpec = tween(durationMillis = 300)
+                                            ) + scaleIn(
+                                                initialScale = 0.9f,
+                                                animationSpec = tween(durationMillis = 300)
                                             )
                                         },
                                         exitTransition = {
-                                            slideOutHorizontally(
+                                            fadeOut(animationSpec = tween(durationMillis = 300)) + slideOutHorizontally(
                                                 targetOffsetX = { it },
+                                                animationSpec = tween(durationMillis = 300)
+                                            ) + scaleOut(
+                                                targetScale = 0.9f, // End slightly smaller
                                                 animationSpec = tween(durationMillis = 300)
                                             )
                                         }
@@ -118,11 +133,17 @@ class MainActivity : ComponentActivity() {
                                             slideInHorizontally(
                                                 initialOffsetX = { it },
                                                 animationSpec = tween(durationMillis = 300)
+                                            ) + scaleIn(
+                                                initialScale = 0.9f,
+                                                animationSpec = tween(durationMillis = 300)
                                             )
                                         },
                                         exitTransition = {
-                                            slideOutHorizontally(
+                                            fadeOut(animationSpec = tween(durationMillis = 300)) + slideOutHorizontally(
                                                 targetOffsetX = { it },
+                                                animationSpec = tween(durationMillis = 300)
+                                            ) + scaleOut(
+                                                targetScale = 0.9f, // End slightly smaller
                                                 animationSpec = tween(durationMillis = 300)
                                             )
                                         }
@@ -142,22 +163,27 @@ class MainActivity : ComponentActivity() {
                                             slideInHorizontally(
                                                 initialOffsetX = { it },
                                                 animationSpec = tween(durationMillis = 300)
+                                            ) + scaleIn(
+                                                initialScale = 0.9f,
+                                                animationSpec = tween(durationMillis = 300)
                                             )
                                         },
                                         exitTransition = {
-                                            slideOutHorizontally(
+                                            fadeOut(animationSpec = tween(durationMillis = 300)) + slideOutHorizontally(
                                                 targetOffsetX = { it },
+                                                animationSpec = tween(durationMillis = 300)
+                                            ) + scaleOut(
+                                                targetScale = 0.9f, // End slightly smaller
                                                 animationSpec = tween(durationMillis = 300)
                                             )
                                         },
                                     ) { backStackEntry ->
-                                        Box(modifier = Modifier.fillMaxSize()) {
                                             AnimeDetailsScreen(
                                                 navController = navController,
                                                 id = backStackEntry.arguments?.getString("id")
                                                     ?.toIntOrNull() ?: 0
                                             )
-                                        }
+
                                     }
 
                                     composable("episodesList/{animeId}",
@@ -165,16 +191,21 @@ class MainActivity : ComponentActivity() {
                                             slideInHorizontally(
                                                 initialOffsetX = { it },
                                                 animationSpec = tween(durationMillis = 300)
+                                            ) + scaleIn(
+                                                initialScale = 0.9f,
+                                                animationSpec = tween(durationMillis = 300)
                                             )
                                         },
                                         exitTransition = {
-                                            slideOutHorizontally(
+                                            fadeOut(animationSpec = tween(durationMillis = 300)) + slideOutHorizontally(
                                                 targetOffsetX = { it },
+                                                animationSpec = tween(durationMillis = 300)
+                                            ) + scaleOut(
+                                                targetScale = 0.9f, // End slightly smaller
                                                 animationSpec = tween(durationMillis = 300)
                                             )
                                         }
                                     ) { backStackEntry ->
-                                        Box(modifier = Modifier.fillMaxSize()) {
                                             EpisodesList(
                                                 navController = navController,
                                                 onBackClicked = { navController.navigateUp() },
@@ -183,7 +214,7 @@ class MainActivity : ComponentActivity() {
                                                 uri = backStackEntry.arguments?.getString("uri")
                                                     ?: ""
                                             )
-                                        }
+
                                     }
 
                                     composable("profile",
@@ -191,11 +222,17 @@ class MainActivity : ComponentActivity() {
                                             slideInHorizontally(
                                                 initialOffsetX = { it },
                                                 animationSpec = tween(durationMillis = 300)
+                                            ) + scaleIn(
+                                                initialScale = 0.9f,
+                                                animationSpec = tween(durationMillis = 300)
                                             )
                                         },
                                         exitTransition = {
-                                            slideOutHorizontally(
+                                            fadeOut(animationSpec = tween(durationMillis = 300)) + slideOutHorizontally(
                                                 targetOffsetX = { it },
+                                                animationSpec = tween(durationMillis = 300)
+                                            ) + scaleOut(
+                                                targetScale = 0.9f, // End slightly smaller
                                                 animationSpec = tween(durationMillis = 300)
                                             )
                                         }
@@ -207,22 +244,28 @@ class MainActivity : ComponentActivity() {
                                             slideInHorizontally(
                                                 initialOffsetX = { it },
                                                 animationSpec = tween(durationMillis = 300)
+                                            ) + scaleIn(
+                                                initialScale = 0.9f,
+                                                animationSpec = tween(durationMillis = 300)
                                             )
+
                                         },
                                         exitTransition = {
-                                            slideOutHorizontally(
+                                            fadeOut(animationSpec = tween(durationMillis = 300)) + slideOutHorizontally(
                                                 targetOffsetX = { it },
+                                                animationSpec = tween(durationMillis = 300)
+                                            ) + scaleOut(
+                                                targetScale = 0.9f, // End slightly smaller
                                                 animationSpec = tween(durationMillis = 300)
                                             )
                                         }
                                     ) { backStackEntry ->
-                                        Box(modifier = Modifier.fillMaxSize()) {
                                             val uriArgument =
                                                 backStackEntry.arguments?.getString("uri")
                                             if (uriArgument != null) {
                                                 LonePlayer(uriArgument)
                                             }
-                                        }
+
                                     }
                                 }
                             }
