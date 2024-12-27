@@ -34,22 +34,15 @@ fun HomeScreen(navController: NavController, viewModel: MainViewModel = viewMode
     val dataStoreRepository = DataStoreRepository(context)
     val (selectedTabIndex, setSelectedTabIndex) = remember { mutableStateOf(0) }
     val tabTitles = listOf("Обновленные", "Избранные")
-    val titles by viewModel.titles.observeAsState(initial = emptyList())
     val searchQuery = remember { mutableStateOf("") }
     val keyboardController = LocalSoftwareKeyboardController.current
-    val showDialog = remember { mutableStateOf(false) } // Use mutable state here
-    val genres = listOf("Комедия", "Романтика", "Драма", "Приключение", "Школа", "Триллер", "Музыка")
-    val selectedGenres = remember { mutableStateListOf<String>() }
 
     CompositionLocalProvider(LocalDataStoreRepository provides dataStoreRepository) {
         MyDynamicTheme {
             Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
                 Column(modifier = Modifier.fillMaxSize()) {
-                    SearchField(searchQuery, viewModel, keyboardController) { showDialog.value = true } // Update showDialog
+                    SearchField(searchQuery, viewModel, keyboardController) // Update showDialog
 
-                    if (showDialog.value) {
-                        GenreSelectionDialog(showDialog, selectedGenres, searchQuery, viewModel) // Pass mutable state
-                    }
 
                     TabRow(selectedTabIndex = selectedTabIndex) {
                         tabTitles.forEachIndexed { index, title ->
@@ -67,62 +60,9 @@ fun HomeScreen(navController: NavController, viewModel: MainViewModel = viewMode
     }
 }
 
-@Composable
-fun GenreSelectionDialog(
-    showDialog: MutableState<Boolean>, // Change to MutableState<Boolean>
-    selectedGenres: MutableList<String>,
-    searchQuery: MutableState<String>,
-    viewModel: MainViewModel,
-) {
-    if (showDialog.value) {
-        AlertDialog(
-            onDismissRequest = { showDialog.value = false }, // Update showDialog
-            title = { Text(text = "Выберите жанры") },
-            text = {
-                Column {
-                    val genres = listOf("Комедия", "Романтика", "Драма", "Приключение", "Школа", "Триллер", "Музыка")
-                    genres.forEach { genre ->
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Checkbox(
-                                checked = selectedGenres.contains(genre),
-                                onCheckedChange = { isSelected ->
-                                    if (isSelected) {
-                                        selectedGenres.add(genre)
-                                    } else {
-                                        selectedGenres.remove(genre)
-                                    }
-                                }
-                            )
-                            Text(text = genre, modifier = Modifier.padding(start = 8.dp))
-                        }
-                    }
-                }
-            },
-            confirmButton = {
-                Button(
-                    onClick = {
-                        viewModel.searchTitlesWithGenres(searchQuery.value, selectedGenres)
-                        showDialog.value = false // Update showDialog
-                    }
-                ) {
-                    Text("Далее")
-                }
-            },
-            dismissButton = {
-                Button(onClick = { showDialog.value = false }) { // Update showDialog
-                    Text("Отмена")
-                }
-            }
-        )
-    }
-}
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SearchField(searchQuery: MutableState<String>, viewModel: MainViewModel, keyboardController: SoftwareKeyboardController?, onShowDialog: () -> Unit) {
+fun SearchField(searchQuery: MutableState<String>, viewModel: MainViewModel, keyboardController: SoftwareKeyboardController?) {
     TextField(
         value = searchQuery.value,
         onValueChange = {
@@ -149,11 +89,6 @@ fun SearchField(searchQuery: MutableState<String>, viewModel: MainViewModel, key
         }),
         leadingIcon = {
             Icon(imageVector = Icons.Default.Search, contentDescription = "Поиск")
-        },
-        trailingIcon = {
-            IconButton(onClick = onShowDialog) {
-                Icon(imageVector = Icons.Default.MoreVert, contentDescription = "Фильтры")
-            }
         }
     )
 }

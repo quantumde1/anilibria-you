@@ -1,6 +1,6 @@
 [versions]
 accompanistSystemuicontroller = "1.0.0"
-agp = "8.7.0"
+agp = "8.7.3"
 bcpkixJdk15on = "1.68"
 bcprovJdk15on = "1.68"
 coilCompose = "2.1.0"
@@ -24,6 +24,8 @@ loggingInterceptor = "4.9.3"
 material3 = "1.2.1"
 media3Session = "1.3.0"
 navigationCompose = "2.7.7"
+navigationComposeVersion = "2.8.5"
+navigationDynamicFeaturesFragment = "2.8.5"
 okhttp = "4.9.3"
 retrofit = "2.9.0"
 runtime = "1.7.3"
@@ -32,6 +34,7 @@ ui = "1.6.4"
 uiToolingPreview = "1.6.4"
 uiVersion = "1.1.1"
 datastoreCore = "1.0.0"
+composeMaterial = "1.4.0"
 
 [libraries]
 accompanist-systemuicontroller = { module = "com.google.accompanist:accompanist-systemuicontroller", version.ref = "accompanistSystemuicontroller" }
@@ -50,6 +53,11 @@ androidx-media3-exoplayer-hls = { module = "androidx.media3:media3-exoplayer-hls
 androidx-media3-session = { module = "androidx.media3:media3-session", version.ref = "media3Session" }
 androidx-media3-ui = { module = "androidx.media3:media3-ui", version.ref = "media3Session" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
+androidx-navigation-compose-v285 = { module = "androidx.navigation:navigation-compose", version.ref = "navigationComposeVersion" }
+androidx-navigation-dynamic-features-fragment = { module = "androidx.navigation:navigation-dynamic-features-fragment", version.ref = "navigationDynamicFeaturesFragment" }
+androidx-navigation-fragment = { module = "androidx.navigation:navigation-fragment", version.ref = "navigationComposeVersion" }
+androidx-navigation-testing = { module = "androidx.navigation:navigation-testing", version.ref = "navigationDynamicFeaturesFragment" }
+androidx-navigation-ui = { module = "androidx.navigation:navigation-ui", version.ref = "navigationDynamicFeaturesFragment" }
 androidx-runtime = { module = "androidx.compose.runtime:runtime", version.ref = "runtime" }
 androidx-runtime-livedata = { module = "androidx.compose.runtime:runtime-livedata" }
 androidx-runtime-v164 = { module = "androidx.compose.runtime:runtime", version.ref = "runtimeVersion" }
@@ -84,6 +92,7 @@ runtime-livedata = { module = "androidx.compose.runtime:runtime-livedata" }
 ui = { module = "androidx.compose.ui:ui", version.ref = "ui" }
 ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview", version.ref = "uiToolingPreview" }
 androidx-datastore-core = { group = "androidx.datastore", name = "datastore-core", version.ref = "datastoreCore" }
+androidx-compose-material = { group = "androidx.wear.compose", name = "compose-material", version.ref = "composeMaterial" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

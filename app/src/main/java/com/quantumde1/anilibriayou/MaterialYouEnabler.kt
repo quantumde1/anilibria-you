@@ -86,7 +86,7 @@ fun SettingsScreen(onThemeChange: (Boolean, Boolean) -> Unit) {
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
-                Text("Сделано quantumde1, никакие права не защищены.")
+                Text("Сделано quantumde1 используя API проекта AniLibria. Все права защищены. Лицензировано под MIT")
                 Spacer(modifier = Modifier.height(4.dp))
                 OpenUrlButton(
                     text = "Matrix",
