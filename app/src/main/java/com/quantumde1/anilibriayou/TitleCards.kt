@@ -30,7 +30,7 @@ import coil.request.ImageRequest
 
 @Composable
 fun ImageCard(navController: NavController, title: Title) {
-    val imageUrl = "http://static.wwnd.space/${title.posters.original.url}"
+    val imageUrl = "https://static.wwnd.space/${title.posters.original.url}"
     val cardText = title.names.ru
     val truncatedText = if (cardText.length > 27) {
         cardText.take(27) + "..."

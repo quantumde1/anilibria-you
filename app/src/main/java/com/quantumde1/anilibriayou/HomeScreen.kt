@@ -2,14 +2,7 @@ package com.quantumde1.anilibriayou
 
 import android.os.Build
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
@@ -17,23 +10,9 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Tab
-import androidx.compose.material3.TabRow
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -69,13 +48,14 @@ fun HomeScreen(navController: NavController, viewModel: MainViewModel = viewMode
                             Tab(
                                 selected = selectedTabIndex == index,
                                 onClick = { setSelectedTabIndex(index) },
-                                text = { Text(title) })
+                                text = { Text(title) }
+                            )
                         }
                     }
 
                     when (selectedTabIndex) {
-                        1 -> FavoritesTabContent(navController)
                         0 -> UpdatesTabContent(viewModel, navController)
+                        1 -> FavoritesTabContent(navController, viewModel)
                     }
                 }
             }
@@ -120,10 +100,10 @@ fun SearchField(
 }
 
 @Composable
-fun FavoritesTabContent(navController: NavController, viewModel: MainViewModel = viewModel()) {
+fun FavoritesTabContent(navController: NavController, viewModel: MainViewModel) {
     val favoriteTitles by viewModel.favoriteTitles.observeAsState(initial = emptyList())
     EmptyStateContent(favoriteTitles.isEmpty(), "Нет добавленных в избранное аниме") {
-        TitleFavoriteListContent(favoriteTitles, navController)
+        TitleListContent(favoriteTitles, navController, viewModel)
     }
 }
 
@@ -131,7 +111,7 @@ fun FavoritesTabContent(navController: NavController, viewModel: MainViewModel =
 fun UpdatesTabContent(viewModel: MainViewModel, navController: NavController) {
     val titles by viewModel.titles.observeAsState(initial = emptyList())
     EmptyStateContent(titles.isEmpty(), "No titles available") {
-        TitleListContent(titles, navController)
+        TitleListContent(titles, navController, viewModel)
     }
 }
 
@@ -148,23 +128,10 @@ fun EmptyStateContent(isEmpty: Boolean, message: String, content: @Composable ()
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun TitleListContent(titles: List<Title>, navController: NavController) {
+fun TitleListContent(titles: List<Title>, navController: NavController, viewModel: MainViewModel) {
     FlowRow(modifier = Modifier.verticalScroll(rememberScrollState())) {
         titles.forEach { title ->
             ImageCard(navController, title)
         }
-    }
-}
-
-@OptIn(ExperimentalLayoutApi::class)
-@Composable
-fun TitleFavoriteListContent(titles: List<Title>, navController: NavController) {
-    val dataStoreRepository = LocalDataStoreRepository.current
-    val favoriteTitleIds by dataStoreRepository.favoriteAnimeTitleIds.collectAsState(initial = setOf())
-
-    val favoriteTitles = titles.filter { it.id in favoriteTitleIds }
-
-    EmptyStateContent(favoriteTitles.isEmpty(), "Нет избранных аниме") {
-        TitleListContent(favoriteTitles, navController)
     }
 }

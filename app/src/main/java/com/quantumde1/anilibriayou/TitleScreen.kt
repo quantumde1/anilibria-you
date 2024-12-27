@@ -31,20 +31,26 @@ import coil.request.ImageRequest
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.util.concurrent.TimeUnit
 
-// AnimeTitleState.kt
 sealed class AnimeTitleState {
     object Loading : AnimeTitleState()
     data class Success(val title: Title) : AnimeTitleState()
     data class Failure(val exception: Exception) : AnimeTitleState()
 }
 
-// ApiService.kt
 suspend fun loadAnimeTitle(id: Int): Title? {
+    val okHttpClient = OkHttpClient.Builder()
+        .connectTimeout(30, TimeUnit.SECONDS) // Set connection timeout
+        .readTimeout(30, TimeUnit.SECONDS)    // Set read timeout
+        .writeTimeout(30, TimeUnit.SECONDS)   // Set write timeout
+        .build()
     val apiService = Retrofit.Builder()
         .baseUrl("https://api.anilibria.tv")
+        .client(okHttpClient)
         .addConverterFactory(GsonConverterFactory.create())
         .build()
         .create(AnilibriaApiService::class.java)
@@ -58,7 +64,6 @@ suspend fun loadAnimeTitle(id: Int): Title? {
     }
 }
 
-// FoldableText.kt
 @Composable
 fun FoldableText(text: String, maxLength: Int = 200) {
     var isFolded by remember { mutableStateOf(true) }
@@ -89,7 +94,6 @@ private fun FoldableTextHeader() {
     }
 }
 
-// AnimeDetailsScreen.kt
 @RequiresApi(Build.VERSION_CODES.S)
 @Composable
 fun AnimeDetailsScreen(navController: NavController, id: Int) {
@@ -98,12 +102,8 @@ fun AnimeDetailsScreen(navController: NavController, id: Int) {
             var animeTitleState by remember { mutableStateOf<AnimeTitleState>(AnimeTitleState.Loading) }
 
             LaunchedEffect(id) {
-                animeTitleState = try {
-                    val title = loadAnimeTitle(id)
-                    title?.let { AnimeTitleState.Success(it) } ?: AnimeTitleState.Failure(Exception("Title is null"))
-                } catch (e: Exception) {
-                    AnimeTitleState.Failure(e)
-                }
+                animeTitleState = loadAnimeTitle(id)?.let { AnimeTitleState.Success(it) }
+                    ?: AnimeTitleState.Failure(Exception("Title is null"))
             }
 
             AnimeDetailsContent(navController, animeTitleState)
@@ -114,7 +114,7 @@ fun AnimeDetailsScreen(navController: NavController, id: Int) {
 @Composable
 private fun AnimeDetailsContent(navController: NavController, animeTitleState: AnimeTitleState) {
     when (animeTitleState) {
-        is AnimeTitleState.Loading -> LoadingIndicator() // Handle the Loading state
+        is AnimeTitleState.Loading -> LoadingIndicator()
         is AnimeTitleState.Success -> AnimeDetailsSuccessContent(navController, animeTitleState.title)
         is AnimeTitleState.Failure -> ErrorContent(animeTitleState.exception)
     }
@@ -182,6 +182,7 @@ private fun AnimeDetailsCard(title: Title) {
                 painter = rememberAsyncImagePainter(
                     ImageRequest.Builder(LocalContext.current).data(imageUrl).apply {
                         listener(onError = { _, throwable ->
+                            Log.e("ImageLoad", "Error loading image")
                         })
                     }.build()
                 ),

@@ -34,7 +34,7 @@ fun LonePlayer(enuri: String) {
     uri = nuri
     val context = LocalContext.current
     val activity = context.findActivity()
-    val lifecycleOwner = LocalLifecycleOwner.current
+    val lifecycleOwner = androidx.lifecycle.compose.LocalLifecycleOwner.current
     val coroutineScope = rememberCoroutineScope()
 
     // Create ExoPlayer instance
