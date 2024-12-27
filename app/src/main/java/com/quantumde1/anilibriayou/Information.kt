@@ -37,7 +37,6 @@ data class Title(
     val type: Type,
     val player: Player?,
     var isFavorite: Boolean = false
-    // ... include other fields as necessary
 )
 
 data class Type(

@@ -2,20 +2,38 @@ package com.quantumde1.anilibriayou
 
 import android.os.Build
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRow
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -39,14 +57,19 @@ fun HomeScreen(navController: NavController, viewModel: MainViewModel = viewMode
 
     CompositionLocalProvider(LocalDataStoreRepository provides dataStoreRepository) {
         MyDynamicTheme {
-            Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
+            Surface(
+                modifier = Modifier.fillMaxSize(),
+                color = MaterialTheme.colorScheme.background
+            ) {
                 Column(modifier = Modifier.fillMaxSize()) {
-                    SearchField(searchQuery, viewModel, keyboardController) // Update showDialog
-
+                    SearchField(searchQuery, viewModel, keyboardController)
 
                     TabRow(selectedTabIndex = selectedTabIndex) {
                         tabTitles.forEachIndexed { index, title ->
-                            Tab(selected = selectedTabIndex == index, onClick = { setSelectedTabIndex(index) }, text = { Text(title) })
+                            Tab(
+                                selected = selectedTabIndex == index,
+                                onClick = { setSelectedTabIndex(index) },
+                                text = { Text(title) })
                         }
                     }
 
@@ -62,7 +85,11 @@ fun HomeScreen(navController: NavController, viewModel: MainViewModel = viewMode
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SearchField(searchQuery: MutableState<String>, viewModel: MainViewModel, keyboardController: SoftwareKeyboardController?) {
+fun SearchField(
+    searchQuery: MutableState<String>,
+    viewModel: MainViewModel,
+    keyboardController: SoftwareKeyboardController?
+) {
     TextField(
         value = searchQuery.value,
         onValueChange = {
@@ -75,8 +102,7 @@ fun SearchField(searchQuery: MutableState<String>, viewModel: MainViewModel, key
         colors = TextFieldDefaults.textFieldColors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant,
             unfocusedIndicatorColor = Color.Transparent,
-            focusedIndicatorColor = Color.Transparent,
-            disabledIndicatorColor = Color.Transparent
+            focusedIndicatorColor = Color.Transparent
         ),
         modifier = Modifier
             .fillMaxWidth()
@@ -93,41 +119,39 @@ fun SearchField(searchQuery: MutableState<String>, viewModel: MainViewModel, key
     )
 }
 
-
 @Composable
 fun FavoritesTabContent(navController: NavController, viewModel: MainViewModel = viewModel()) {
     val favoriteTitles by viewModel.favoriteTitles.observeAsState(initial = emptyList())
-
-    if (favoriteTitles.isEmpty()) {
-        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            Text("Нет добавленных в избранное аниме")
-        }
-    } else {
-        TitleFavoriteListContent(titles = favoriteTitles, navController = navController)
+    EmptyStateContent(favoriteTitles.isEmpty(), "Нет добавленных в избранное аниме") {
+        TitleFavoriteListContent(favoriteTitles, navController)
     }
 }
 
 @Composable
 fun UpdatesTabContent(viewModel: MainViewModel, navController: NavController) {
     val titles by viewModel.titles.observeAsState(initial = emptyList())
-
-    Column {
+    EmptyStateContent(titles.isEmpty(), "No titles available") {
         TitleListContent(titles, navController)
+    }
+}
+
+@Composable
+fun EmptyStateContent(isEmpty: Boolean, message: String, content: @Composable () -> Unit) {
+    if (isEmpty) {
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            Text(message)
+        }
+    } else {
+        content()
     }
 }
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun TitleListContent(titles: List<Title>, navController: NavController) {
-    if (titles.isEmpty()) {
-        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            Text("No titles available")
-        }
-    } else {
-        FlowRow(modifier = Modifier.verticalScroll(rememberScrollState())) {
-            titles.forEach { title ->
-                ImageCard(navController, title)
-            }
+    FlowRow(modifier = Modifier.verticalScroll(rememberScrollState())) {
+        titles.forEach { title ->
+            ImageCard(navController, title)
         }
     }
 }
@@ -140,15 +164,7 @@ fun TitleFavoriteListContent(titles: List<Title>, navController: NavController) 
 
     val favoriteTitles = titles.filter { it.id in favoriteTitleIds }
 
-    if (favoriteTitles.isEmpty()) {
-        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            Text("Нет избранных аниме")
-        }
-    } else {
-        FlowRow(modifier = Modifier.verticalScroll(rememberScrollState())) {
-            favoriteTitles.forEach { title ->
-                ImageCard(navController, title)
-            }
-        }
+    EmptyStateContent(favoriteTitles.isEmpty(), "Нет избранных аниме") {
+        TitleListContent(favoriteTitles, navController)
     }
 }

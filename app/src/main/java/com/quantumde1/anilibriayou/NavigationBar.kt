@@ -1,7 +1,5 @@
 package com.quantumde1.anilibriayou
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
@@ -21,15 +19,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
 
-@RequiresApi(Build.VERSION_CODES.S)
 @Composable
 fun MyBottomBar(
     navController: NavController,
@@ -65,18 +59,15 @@ fun MyBottomBar(
                                     modifier = Modifier
                                         .size(if (selected) 28.dp else 24.dp) // Увеличиваем иконку при выборе
                                 )
-                                if (selected) {
-                                    Text(
-                                        text = item.title,
-                                        style = TextStyle(
-                                            fontSize = 10.sp, // Изменяем размер текста
-                                            fontWeight = FontWeight.Bold // Можно добавить жирный шрифт
-                                        )
-                                    )
-                                }
                             }
                         },
-                        label = null, // Убираем текст
+                        label = {
+                            if (selected) {
+                                Text(item.title) // Use Text composable for the label
+                            } else {
+                                null
+                            }
+                        },
                         selected = selected,
                         onClick = {
                             navigateToDestination(navController, item.route, currentRoute)
@@ -87,7 +78,6 @@ fun MyBottomBar(
         }
     }
 }
-
 
 private fun navigateToDestination(navController: NavController, route: String, currentRoute: String?) {
     if (currentRoute != route) {

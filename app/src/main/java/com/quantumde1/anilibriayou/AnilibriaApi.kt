@@ -15,13 +15,13 @@ import retrofit2.http.GET
 import retrofit2.http.Query
 
 interface AnilibriaApiService {
-    @GET("api/v3/title/updates")
+    @GET("v3/title/updates")
     suspend fun getTitleList(@Query("items_per_page") itemsPerPage: Int): Response<TitleListResponse>
 
-    @GET("api/v3/title/search")
+    @GET("v3/title/search")
     suspend fun searchTitles(@Query("search") searchQuery: String): Response<TitleListResponse>
 
-    @GET("api/v3/title")
+    @GET("v3/title")
     suspend fun getAnimeDetails(@Query("id") id: Int): Response<Title>
 }
 
@@ -36,13 +36,12 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     val episodes: LiveData<List<Episode>> = _episodes
 
     private val _favoriteTitleIds = MutableLiveData<Set<Int>>()
-    val favoriteTitleIds: LiveData<Set<Int>> = _favoriteTitleIds
 
     private val _favoriteTitles = MutableLiveData<List<Title>>()
     val favoriteTitles: LiveData<List<Title>> = _favoriteTitles
 
     private val apiService = Retrofit.Builder()
-        .baseUrl("https://api.anilibria.tv")
+        .baseUrl("http://api.anilibria.tv")
         .addConverterFactory(GsonConverterFactory.create())
         .build()
         .create(AnilibriaApiService::class.java)
@@ -57,7 +56,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         Log.e(tag, message, throwable)
     }
 
-    private suspend fun <T> safeApiCall(apiCall: suspend () -> Response<T>, onSuccess: (T) -> Unit) {
+    private suspend fun <T> safeApiCall(
+        apiCall: suspend () -> Response<T>,
+        onSuccess: (T) -> Unit
+    ) {
         try {
             val response = apiCall()
             response.body()?.let { onSuccess(it) } ?: run {
@@ -106,28 +108,11 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun saveFavoriteAnimeTitleId(id: Int) {
-        viewModelScope.launch {
-            dataStoreRepository.saveFavoriteAnimeTitleId(id)
-        }
-    }
-
-    fun removeFavoriteAnimeTitleId(id: Int) {
-        viewModelScope.launch {
-            dataStoreRepository.removeFavoriteAnimeTitleId(id)
-        }
-    }
-
     fun searchTitles(searchQuery: String) {
         viewModelScope.launch {
             safeApiCall({ apiService.searchTitles(searchQuery) }) { titleListResponse ->
                 _titles.postValue(titleListResponse.list)
             }
         }
-    }
-
-    fun searchTitlesWithGenres(searchQuery: String, selectedGenres: List<String>) {
-        // Implement the search logic with genres if needed
-        // This function can be optimized similarly to the others
     }
 }

@@ -5,8 +5,10 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.annotation.RequiresApi
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
@@ -31,8 +33,6 @@ import androidx.core.view.WindowInsetsControllerCompat
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.compose.animation.core.tween
-import androidx.compose.foundation.layout.Box
 
 @Composable
 fun MyDynamicTheme(content: @Composable () -> Unit) {
@@ -66,167 +66,167 @@ class MainActivity : ComponentActivity() {
             val dataStoreRepository = DataStoreRepository(context)
             CompositionLocalProvider(LocalThemeSettings provides themeSettings.value) {
                 CompositionLocalProvider(LocalDataStoreRepository provides dataStoreRepository) {
-                MyDynamicTheme {
-                    Surface(
-                        modifier = Modifier.fillMaxSize(),
-                        color = MaterialTheme.colorScheme.background
-                    ) {
+                    MyDynamicTheme {
+                        Surface(
+                            modifier = Modifier.fillMaxSize(),
+                            color = MaterialTheme.colorScheme.background
+                        ) {
 
-                        val navController = rememberNavController()
-                        Scaffold(
-                            bottomBar = {
-                                MyBottomBar(navController)
-                            },
-                        ) { innerPadding ->
-                            NavHost(
-                                navController = navController,
-                                startDestination = "home",
-                                modifier = Modifier.padding(innerPadding)
-                            ) {
-                                composable("home",
-                                    enterTransition = {
-                                        slideInHorizontally(
-                                            initialOffsetX = { -it },
-                                            animationSpec = tween(durationMillis = 300)
-                                        )
-                                    },
-                                    exitTransition = {
-                                        slideOutHorizontally(
-                                            targetOffsetX = { -it },
-                                            animationSpec = tween(durationMillis = 300)
-                                        )
-                                    }
-                                ) { HomeScreen(navController) }
-
-                                composable("favorites",
-                                    enterTransition = {
-                                        slideInHorizontally(
-                                            initialOffsetX = { -it },
-                                            animationSpec = tween(durationMillis = 300)
-                                        )
-                                    },
-                                    exitTransition = {
-                                        slideOutHorizontally(
-                                            targetOffsetX = { -it },
-                                            animationSpec = tween(durationMillis = 300)
-                                        )
-                                    }
-                                ) { HomeScreen(navController) }
-
-                                composable("settings",
-                                    enterTransition = {
-                                        slideInHorizontally(
-                                            initialOffsetX = { -it },
-                                            animationSpec = tween(durationMillis = 300)
-                                        )
-                                    },
-                                    exitTransition = {
-                                        slideOutHorizontally(
-                                            targetOffsetX = { -it },
-                                            animationSpec = tween(durationMillis = 300)
-                                        )
-                                    }
+                            val navController = rememberNavController()
+                            Scaffold(
+                                bottomBar = {
+                                    MyBottomBar(navController)
+                                },
+                            ) { innerPadding ->
+                                NavHost(
+                                    navController = navController,
+                                    startDestination = "home",
+                                    modifier = Modifier.padding(innerPadding)
                                 ) {
-                                    SettingsScreen { darkTheme, dynamicColors ->
-                                        themeSettings.value = Pair(darkTheme, dynamicColors)
-                                        PreferencesManager.saveSettings(
-                                            navController.context,
-                                            darkTheme,
-                                            dynamicColors
-                                        )
-                                    }
-                                }
+                                    composable("home",
+                                        enterTransition = {
+                                            slideInHorizontally(
+                                                initialOffsetX = { it },
+                                                animationSpec = tween(durationMillis = 300)
+                                            )
+                                        },
+                                        exitTransition = {
+                                            slideOutHorizontally(
+                                                targetOffsetX = { it },
+                                                animationSpec = tween(durationMillis = 300)
+                                            )
+                                        }
+                                    ) { HomeScreen(navController) }
 
-                                composable("animeDetails/{id}",
-                                    enterTransition = {
-                                        slideInHorizontally(
-                                            initialOffsetX = { -it },
-                                            animationSpec = tween(durationMillis = 300)
-                                        )
-                                    },
-                                    exitTransition = {
-                                        slideOutHorizontally(
-                                            targetOffsetX = { -it },
-                                            animationSpec = tween(durationMillis = 300)
-                                        )
-                                    },
-                                ) { backStackEntry ->
-                                    Box(modifier = Modifier.fillMaxSize()) {
-                                        AnimeDetailsScreen(
-                                            navController = navController,
-                                            id = backStackEntry.arguments?.getString("id")
-                                                ?.toIntOrNull() ?: 0
-                                        )
-                                    }
-                                }
+                                    composable("favorites",
+                                        enterTransition = {
+                                            slideInHorizontally(
+                                                initialOffsetX = { it },
+                                                animationSpec = tween(durationMillis = 300)
+                                            )
+                                        },
+                                        exitTransition = {
+                                            slideOutHorizontally(
+                                                targetOffsetX = { it },
+                                                animationSpec = tween(durationMillis = 300)
+                                            )
+                                        }
+                                    ) { HomeScreen(navController) }
 
-                                composable("episodesList/{animeId}",
-                                    enterTransition = {
-                                        slideInHorizontally(
-                                            initialOffsetX = { -it },
-                                            animationSpec = tween(durationMillis = 300)
-                                        )
-                                    },
-                                    exitTransition = {
-                                        slideOutHorizontally(
-                                            targetOffsetX = { -it },
-                                            animationSpec = tween(durationMillis = 300)
-                                        )
+                                    composable("settings",
+                                        enterTransition = {
+                                            slideInHorizontally(
+                                                initialOffsetX = { it },
+                                                animationSpec = tween(durationMillis = 300)
+                                            )
+                                        },
+                                        exitTransition = {
+                                            slideOutHorizontally(
+                                                targetOffsetX = { it },
+                                                animationSpec = tween(durationMillis = 300)
+                                            )
+                                        }
+                                    ) {
+                                        SettingsScreen { darkTheme, dynamicColors ->
+                                            themeSettings.value = Pair(darkTheme, dynamicColors)
+                                            PreferencesManager.saveSettings(
+                                                navController.context,
+                                                darkTheme,
+                                                dynamicColors
+                                            )
+                                        }
                                     }
-                                ) { backStackEntry ->
-                                    Box(modifier = Modifier.fillMaxSize()) {
-                                        EpisodesList(
-                                            navController = navController,
-                                            onBackClicked = { navController.navigateUp() },
-                                            animeId = backStackEntry.arguments?.getString("animeId")
-                                                ?.toIntOrNull() ?: -1,
-                                            uri = backStackEntry.arguments?.getString("uri")
-                                                ?: ""
-                                        )
-                                    }
-                                }
 
-                                composable("profile",
-                                    enterTransition = {
-                                        slideInHorizontally(
-                                            initialOffsetX = { -it },
-                                            animationSpec = tween(durationMillis = 300)
-                                        )
-                                    },
-                                    exitTransition = {
-                                        slideOutHorizontally(
-                                            targetOffsetX = { -it },
-                                            animationSpec = tween(durationMillis = 300)
-                                        )
+                                    composable("animeDetails/{id}",
+                                        enterTransition = {
+                                            slideInHorizontally(
+                                                initialOffsetX = { it },
+                                                animationSpec = tween(durationMillis = 300)
+                                            )
+                                        },
+                                        exitTransition = {
+                                            slideOutHorizontally(
+                                                targetOffsetX = { it },
+                                                animationSpec = tween(durationMillis = 300)
+                                            )
+                                        },
+                                    ) { backStackEntry ->
+                                        Box(modifier = Modifier.fillMaxSize()) {
+                                            AnimeDetailsScreen(
+                                                navController = navController,
+                                                id = backStackEntry.arguments?.getString("id")
+                                                    ?.toIntOrNull() ?: 0
+                                            )
+                                        }
                                     }
-                                ) { backStackEntry -> ProfileScreen() }
 
-                                composable("LonePlayer/{uri}",
-
-                                    enterTransition = {
-                                        slideInHorizontally(
-                                            initialOffsetX = { -it },
-                                            animationSpec = tween(durationMillis = 300)
-                                        )
-                                    },
-                                    exitTransition = {
-                                        slideOutHorizontally(
-                                            targetOffsetX = { -it },
-                                            animationSpec = tween(durationMillis = 300)
-                                        )
+                                    composable("episodesList/{animeId}",
+                                        enterTransition = {
+                                            slideInHorizontally(
+                                                initialOffsetX = { it },
+                                                animationSpec = tween(durationMillis = 300)
+                                            )
+                                        },
+                                        exitTransition = {
+                                            slideOutHorizontally(
+                                                targetOffsetX = { it },
+                                                animationSpec = tween(durationMillis = 300)
+                                            )
+                                        }
+                                    ) { backStackEntry ->
+                                        Box(modifier = Modifier.fillMaxSize()) {
+                                            EpisodesList(
+                                                navController = navController,
+                                                onBackClicked = { navController.navigateUp() },
+                                                animeId = backStackEntry.arguments?.getString("animeId")
+                                                    ?.toIntOrNull() ?: -1,
+                                                uri = backStackEntry.arguments?.getString("uri")
+                                                    ?: ""
+                                            )
+                                        }
                                     }
-                                ) { backStackEntry ->
-                                    Box(modifier = Modifier.fillMaxSize()) {
-                                        val uriArgument =
-                                            backStackEntry.arguments?.getString("uri")
-                                        if (uriArgument != null) {
-                                            LonePlayer(uriArgument)
+
+                                    composable("profile",
+                                        enterTransition = {
+                                            slideInHorizontally(
+                                                initialOffsetX = { it },
+                                                animationSpec = tween(durationMillis = 300)
+                                            )
+                                        },
+                                        exitTransition = {
+                                            slideOutHorizontally(
+                                                targetOffsetX = { it },
+                                                animationSpec = tween(durationMillis = 300)
+                                            )
+                                        }
+                                    ) { backStackEntry -> ProfileScreen() }
+
+                                    composable("LonePlayer/{uri}",
+
+                                        enterTransition = {
+                                            slideInHorizontally(
+                                                initialOffsetX = { it },
+                                                animationSpec = tween(durationMillis = 300)
+                                            )
+                                        },
+                                        exitTransition = {
+                                            slideOutHorizontally(
+                                                targetOffsetX = { it },
+                                                animationSpec = tween(durationMillis = 300)
+                                            )
+                                        }
+                                    ) { backStackEntry ->
+                                        Box(modifier = Modifier.fillMaxSize()) {
+                                            val uriArgument =
+                                                backStackEntry.arguments?.getString("uri")
+                                            if (uriArgument != null) {
+                                                LonePlayer(uriArgument)
+                                            }
                                         }
                                     }
                                 }
                             }
                         }
-                    }
                     }
                 }
             }

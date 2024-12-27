@@ -1,6 +1,5 @@
 package com.quantumde1.anilibriayou
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -31,19 +30,17 @@ import coil.request.ImageRequest
 
 @Composable
 fun ImageCard(navController: NavController, title: Title) {
-    val imageUrl = "https://static.wwnd.space/${title.posters.original.url}"
+    val imageUrl = "http://static.wwnd.space/${title.posters.original.url}"
     val cardText = title.names.ru
-    val truncatedText = if (cardText.length > 20) {
-        cardText.take(28) + "..."
+    val truncatedText = if (cardText.length > 27) {
+        cardText.take(27) + "..."
     } else {
         cardText
     }
 
     val configuration = LocalConfiguration.current
-    val screenWidth = configuration.screenWidthDp.dp
-    val screenHeight = configuration.screenHeightDp.dp
-    val cardWidth = screenWidth * 0.5f // 50% of screen width
-    val cardHeight = screenHeight * 0.375f // 37.5% of screen height, which is 3/8
+    val cardWidth = configuration.screenWidthDp.dp * 0.5f // 50% of screen width
+    val cardHeight = configuration.screenHeightDp.dp * 0.375f // 37.5% of screen height
 
     Card(
         modifier = Modifier
@@ -56,24 +53,22 @@ fun ImageCard(navController: NavController, title: Title) {
         shape = RoundedCornerShape(15.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 5.dp)
     ) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
+        Box(modifier = Modifier.fillMaxSize()) {
+            val painter = rememberAsyncImagePainter(
+                ImageRequest.Builder(LocalContext.current)
+                    .data(imageUrl)
+                    .listener(onError = { _, throwable ->
+                    })
+                    .build()
+            )
 
-        ) {
             Image(
-                painter = // Replace with your error drawable resource
-                rememberAsyncImagePainter(
-                    ImageRequest.Builder(LocalContext.current).data(imageUrl).apply(block = fun ImageRequest.Builder.() {
-                        listener(onError = { _, throwable ->
-                            Log.e("ImageCard", "Error loading image", throwable.throwable)
-                        })// Replace with your error drawable resource
-                    }).build()
-                ), // Use Coil to load the image from the URL
+                painter = painter,
                 contentDescription = truncatedText,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxSize()
             )
+
             Text(
                 text = truncatedText,
                 modifier = Modifier

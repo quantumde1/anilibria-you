@@ -18,28 +18,26 @@ object PreferencesKeys {
 
 class DataStoreRepository(context: Context) {
     private val dataStore = context.dataStore
-    fun isFavoriteAnimeTitleId(titleId: String): Flow<Boolean> {
-        return dataStore.data.map { preferences ->
-            val favorites = preferences[PreferencesKeys.FAVORITE_ANIME_TITLES_KEY] ?: setOf()
-            favorites.contains(titleId)
-        }
-    }
+
     suspend fun saveFavoriteAnimeTitleId(id: Int) {
         dataStore.edit { preferences ->
             val currentFavorites = preferences[PreferencesKeys.FAVORITE_ANIME_TITLES_KEY] ?: setOf()
-            preferences[PreferencesKeys.FAVORITE_ANIME_TITLES_KEY] = currentFavorites + id.toString()
+            preferences[PreferencesKeys.FAVORITE_ANIME_TITLES_KEY] =
+                currentFavorites + id.toString()
         }
     }
 
     suspend fun removeFavoriteAnimeTitleId(id: Int) {
         dataStore.edit { preferences ->
             val currentFavorites = preferences[PreferencesKeys.FAVORITE_ANIME_TITLES_KEY] ?: setOf()
-            preferences[PreferencesKeys.FAVORITE_ANIME_TITLES_KEY] = currentFavorites - id.toString()
+            preferences[PreferencesKeys.FAVORITE_ANIME_TITLES_KEY] =
+                currentFavorites - id.toString()
         }
     }
 
     val favoriteAnimeTitleIds: Flow<Set<Int>> = dataStore.data
         .map { preferences ->
-            preferences[PreferencesKeys.FAVORITE_ANIME_TITLES_KEY]?.mapNotNull { it.toIntOrNull() }?.toSet() ?: setOf()
+            preferences[PreferencesKeys.FAVORITE_ANIME_TITLES_KEY]?.mapNotNull { it.toIntOrNull() }
+                ?.toSet() ?: setOf()
         }
 }
