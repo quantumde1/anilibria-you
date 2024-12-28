@@ -12,14 +12,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.media3.common.MediaItem
-import androidx.media3.common.util.Log
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.PlayerView
@@ -30,7 +28,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun LonePlayer(enuri: String) {
     var uri = Uri.decode(enuri)
-    var nuri = "https://cache.libria.fun/"+uri
+    val nuri = "https://cache.libria.fun/$uri"
     uri = nuri
     val context = LocalContext.current
     val activity = context.findActivity()
@@ -93,7 +91,7 @@ fun LonePlayer(enuri: String) {
 
     // PlayerView
     AndroidView(
-        { context ->
+        {
             PlayerView(context).apply {
                 player = exoPlayer
                 setBackgroundColor(Color.Black.toArgb())
