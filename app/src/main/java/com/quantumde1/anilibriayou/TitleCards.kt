@@ -57,8 +57,7 @@ fun ImageCard(navController: NavController, title: Title) {
             val painter = rememberAsyncImagePainter(
                 ImageRequest.Builder(LocalContext.current)
                     .data(imageUrl)
-                    .listener(onError = { _, throwable ->
-                    })
+                    .listener()
                     .build()
             )
 

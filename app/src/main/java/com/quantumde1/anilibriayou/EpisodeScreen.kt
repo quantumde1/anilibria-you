@@ -93,10 +93,7 @@ fun EpisodesList(
     animeId: Int,
     uri: String
 ) {
-    val context = LocalContext.current
-    val (themeSettings, setThemeSettings) = remember {
-        mutableStateOf(PreferencesManager.getSettings(context))
-    }
+
     MyDynamicTheme {
         Surface(
             modifier = Modifier.fillMaxSize(),

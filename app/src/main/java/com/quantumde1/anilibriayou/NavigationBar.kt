@@ -64,8 +64,6 @@ fun MyBottomBar(
                         label = {
                             if (selected) {
                                 Text(item.title) // Use Text composable for the label
-                            } else {
-                                null
                             }
                         },
                         selected = selected,

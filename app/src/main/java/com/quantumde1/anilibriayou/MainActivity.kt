@@ -236,7 +236,9 @@ class MainActivity : ComponentActivity() {
                                                 animationSpec = tween(durationMillis = 300)
                                             )
                                         }
-                                    ) { backStackEntry -> ProfileScreen() }
+                                    ) {
+                                        ProfileScreen()
+                                    }
 
                                     composable("LonePlayer/{uri}",
 

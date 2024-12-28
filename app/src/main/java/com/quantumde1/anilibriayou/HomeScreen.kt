@@ -7,6 +7,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.selection.LocalTextSelectionColors
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
@@ -29,7 +30,7 @@ import androidx.navigation.NavController
 fun HomeScreen(navController: NavController, viewModel: MainViewModel = viewModel()) {
     val context = LocalContext.current
     val dataStoreRepository = DataStoreRepository(context)
-    val (selectedTabIndex, setSelectedTabIndex) = remember { mutableStateOf(0) }
+    val (selectedTabIndex, setSelectedTabIndex) = remember { mutableIntStateOf(0) }
     val tabTitles = listOf("Обновленные", "Избранные")
     val searchQuery = remember { mutableStateOf("") }
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -63,7 +64,6 @@ fun HomeScreen(navController: NavController, viewModel: MainViewModel = viewMode
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchField(
     searchQuery: MutableState<String>,
@@ -79,10 +79,13 @@ fun SearchField(
         placeholder = { Text("Поиск") },
         singleLine = true,
         shape = RoundedCornerShape(50),
-        colors = TextFieldDefaults.textFieldColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant,
+        colors = TextFieldDefaults.colors(
+            focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+            unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+            disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+            selectionColors = LocalTextSelectionColors.current,
+            focusedIndicatorColor = Color.Transparent,
             unfocusedIndicatorColor = Color.Transparent,
-            focusedIndicatorColor = Color.Transparent
         ),
         modifier = Modifier
             .fillMaxWidth()
@@ -103,7 +106,7 @@ fun SearchField(
 fun FavoritesTabContent(navController: NavController, viewModel: MainViewModel) {
     val favoriteTitles by viewModel.favoriteTitles.observeAsState(initial = emptyList())
     EmptyStateContent(favoriteTitles.isEmpty(), "Нет добавленных в избранное аниме") {
-        TitleListContent(favoriteTitles, navController, viewModel)
+        TitleListContent(favoriteTitles, navController)
     }
 }
 
@@ -111,7 +114,7 @@ fun FavoritesTabContent(navController: NavController, viewModel: MainViewModel) 
 fun UpdatesTabContent(viewModel: MainViewModel, navController: NavController) {
     val titles by viewModel.titles.observeAsState(initial = emptyList())
     EmptyStateContent(titles.isEmpty(), "No titles available") {
-        TitleListContent(titles, navController, viewModel)
+        TitleListContent(titles, navController)
     }
 }
 
@@ -128,7 +131,7 @@ fun EmptyStateContent(isEmpty: Boolean, message: String, content: @Composable ()
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun TitleListContent(titles: List<Title>, navController: NavController, viewModel: MainViewModel) {
+fun TitleListContent(titles: List<Title>, navController: NavController) {
     FlowRow(modifier = Modifier.verticalScroll(rememberScrollState())) {
         titles.forEach { title ->
             ImageCard(navController, title)

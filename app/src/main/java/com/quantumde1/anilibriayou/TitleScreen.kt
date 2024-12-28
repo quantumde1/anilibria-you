@@ -181,9 +181,7 @@ private fun AnimeDetailsCard(title: Title) {
             Image(
                 painter = rememberAsyncImagePainter(
                     ImageRequest.Builder(LocalContext.current).data(imageUrl).apply {
-                        listener(onError = { _, throwable ->
-                            Log.e("ImageLoad", "Error loading image")
-                        })
+                        listener()
                     }.build()
                 ),
                 contentDescription = null,
@@ -218,7 +216,6 @@ val LocalDataStoreRepository = compositionLocalOf<DataStoreRepository> {
 @Composable
 private fun AnimeDetailsButtons(navController: NavController, title: Title) {
     val dataStoreRepository = LocalDataStoreRepository.current
-    val context = LocalContext.current
     val isFavorite = remember { mutableStateOf(title.isFavorite) }
 
     Row(
