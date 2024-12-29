@@ -6,6 +6,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
@@ -87,64 +88,28 @@ class MainActivity : ComponentActivity() {
                                 ) {
                                     composable("home",
                                         enterTransition = {
-                                            slideInHorizontally(
-                                                initialOffsetX = { it },
-                                                animationSpec = tween(durationMillis = 300)
-                                            ) + scaleIn(
-                                                initialScale = 0.9f,
-                                                animationSpec = tween(durationMillis = 300)
-                                            )
+                                            fadeIn(animationSpec = tween(durationMillis = 300))
                                         },
                                         exitTransition = {
-                                            fadeOut(animationSpec = tween(durationMillis = 300)) + slideOutHorizontally(
-                                                targetOffsetX = { it },
-                                                animationSpec = tween(durationMillis = 300)
-                                            ) + scaleOut(
-                                                targetScale = 0.9f, // End slightly smaller
-                                                animationSpec = tween(durationMillis = 300)
-                                            )
+                                            fadeOut(animationSpec = tween(durationMillis = 300))
                                         }
                                     ) { HomeScreen(navController) }
 
                                     composable("favorites",
                                         enterTransition = {
-                                            slideInHorizontally(
-                                                initialOffsetX = { it },
-                                                animationSpec = tween(durationMillis = 300)
-                                            ) + scaleIn(
-                                                initialScale = 0.9f,
-                                                animationSpec = tween(durationMillis = 300)
-                                            )
+                                            fadeIn(animationSpec = tween(durationMillis = 300))
                                         },
                                         exitTransition = {
-                                            fadeOut(animationSpec = tween(durationMillis = 300)) + slideOutHorizontally(
-                                                targetOffsetX = { it },
-                                                animationSpec = tween(durationMillis = 300)
-                                            ) + scaleOut(
-                                                targetScale = 0.9f, // End slightly smaller
-                                                animationSpec = tween(durationMillis = 300)
-                                            )
+                                            fadeOut(animationSpec = tween(durationMillis = 300))
                                         }
                                     ) { HomeScreen(navController) }
 
                                     composable("settings",
                                         enterTransition = {
-                                            slideInHorizontally(
-                                                initialOffsetX = { it },
-                                                animationSpec = tween(durationMillis = 300)
-                                            ) + scaleIn(
-                                                initialScale = 0.9f,
-                                                animationSpec = tween(durationMillis = 300)
-                                            )
+                                            fadeIn(animationSpec = tween(durationMillis = 300))
                                         },
                                         exitTransition = {
-                                            fadeOut(animationSpec = tween(durationMillis = 300)) + slideOutHorizontally(
-                                                targetOffsetX = { it },
-                                                animationSpec = tween(durationMillis = 300)
-                                            ) + scaleOut(
-                                                targetScale = 0.9f, // End slightly smaller
-                                                animationSpec = tween(durationMillis = 300)
-                                            )
+                                            fadeOut(animationSpec = tween(durationMillis = 300))
                                         }
                                     ) {
                                         SettingsScreen { darkTheme, dynamicColors ->
@@ -160,20 +125,20 @@ class MainActivity : ComponentActivity() {
                                     composable("animeDetails/{id}",
                                         enterTransition = {
                                             slideInHorizontally(
-                                                initialOffsetX = { it },
-                                                animationSpec = tween(durationMillis = 300)
+                                                initialOffsetX = { -it },
+                                                animationSpec = tween(durationMillis = 400)
                                             ) + scaleIn(
                                                 initialScale = 0.9f,
-                                                animationSpec = tween(durationMillis = 300)
+                                                animationSpec = tween(durationMillis = 400)
                                             )
                                         },
                                         exitTransition = {
                                             fadeOut(animationSpec = tween(durationMillis = 300)) + slideOutHorizontally(
                                                 targetOffsetX = { it },
-                                                animationSpec = tween(durationMillis = 300)
+                                                animationSpec = tween(durationMillis = 400)
                                             ) + scaleOut(
                                                 targetScale = 0.9f, // End slightly smaller
-                                                animationSpec = tween(durationMillis = 300)
+                                                animationSpec = tween(durationMillis = 400)
                                             )
                                         },
                                     ) { backStackEntry ->
@@ -188,7 +153,7 @@ class MainActivity : ComponentActivity() {
                                     composable("episodesList/{animeId}",
                                         enterTransition = {
                                             slideInHorizontally(
-                                                initialOffsetX = { it },
+                                                initialOffsetX = { -it },
                                                 animationSpec = tween(durationMillis = 300)
                                             ) + scaleIn(
                                                 initialScale = 0.9f,
@@ -198,10 +163,10 @@ class MainActivity : ComponentActivity() {
                                         exitTransition = {
                                             fadeOut(animationSpec = tween(durationMillis = 300)) + slideOutHorizontally(
                                                 targetOffsetX = { it },
-                                                animationSpec = tween(durationMillis = 300)
+                                                animationSpec = tween(durationMillis = 400)
                                             ) + scaleOut(
                                                 targetScale = 0.9f, // End slightly smaller
-                                                animationSpec = tween(durationMillis = 300)
+                                                animationSpec = tween(durationMillis = 400)
                                             )
                                         }
                                     ) { backStackEntry ->
@@ -218,49 +183,17 @@ class MainActivity : ComponentActivity() {
 
                                     composable("profile",
                                         enterTransition = {
-                                            slideInHorizontally(
-                                                initialOffsetX = { it },
-                                                animationSpec = tween(durationMillis = 300)
-                                            ) + scaleIn(
-                                                initialScale = 0.9f,
-                                                animationSpec = tween(durationMillis = 300)
-                                            )
+                                            fadeIn(animationSpec = tween(durationMillis = 300))
                                         },
                                         exitTransition = {
-                                            fadeOut(animationSpec = tween(durationMillis = 300)) + slideOutHorizontally(
-                                                targetOffsetX = { it },
-                                                animationSpec = tween(durationMillis = 300)
-                                            ) + scaleOut(
-                                                targetScale = 0.9f, // End slightly smaller
-                                                animationSpec = tween(durationMillis = 300)
-                                            )
+                                            fadeOut(animationSpec = tween(durationMillis = 300))
                                         }
                                     ) {
                                         ProfileScreen()
                                     }
 
-                                    composable("LonePlayer/{uri}",
-
-                                        enterTransition = {
-                                            slideInHorizontally(
-                                                initialOffsetX = { it },
-                                                animationSpec = tween(durationMillis = 300)
-                                            ) + scaleIn(
-                                                initialScale = 0.9f,
-                                                animationSpec = tween(durationMillis = 300)
-                                            )
-
-                                        },
-                                        exitTransition = {
-                                            fadeOut(animationSpec = tween(durationMillis = 300)) + slideOutHorizontally(
-                                                targetOffsetX = { it },
-                                                animationSpec = tween(durationMillis = 300)
-                                            ) + scaleOut(
-                                                targetScale = 0.9f, // End slightly smaller
-                                                animationSpec = tween(durationMillis = 300)
-                                            )
-                                        }
-                                    ) { backStackEntry ->
+                                    composable("LonePlayer/{uri}") {
+                                        backStackEntry ->
                                             val uriArgument =
                                                 backStackEntry.arguments?.getString("uri")
                                             if (uriArgument != null) {

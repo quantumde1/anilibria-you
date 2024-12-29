@@ -2,6 +2,8 @@ package com.quantumde1.anilibriayou
 
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.compose.animation.Crossfade
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -17,6 +19,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.SoftwareKeyboardController
@@ -41,7 +44,16 @@ fun HomeScreen(navController: NavController, viewModel: MainViewModel = viewMode
                 modifier = Modifier.fillMaxSize(),
                 color = MaterialTheme.colorScheme.background
             ) {
-                Column(modifier = Modifier.fillMaxSize()) {
+                Column(modifier = Modifier.fillMaxSize().pointerInput(Unit) {
+                    detectHorizontalDragGestures { change, dragAmount ->
+                        if (dragAmount < 0 && selectedTabIndex != 1) {
+                            setSelectedTabIndex(1)
+                        } else {
+                            setSelectedTabIndex(0)
+                        }
+                        change.consume() // Consume the change if you want to prevent further processing
+                    }
+                }) {
                     SearchField(searchQuery, viewModel, keyboardController)
 
                     TabRow(selectedTabIndex = selectedTabIndex) {
@@ -54,9 +66,13 @@ fun HomeScreen(navController: NavController, viewModel: MainViewModel = viewMode
                         }
                     }
 
-                    when (selectedTabIndex) {
-                        0 -> UpdatesTabContent(viewModel, navController)
-                        1 -> FavoritesTabContent(navController, viewModel)
+                    // Плавный переход между вкладками
+                    Crossfade(targetState = selectedTabIndex) { tabIndex ->
+                        when (tabIndex) {
+                            0 -> UpdatesTabContent(viewModel, navController)
+                            1 -> FavoritesTabContent(navController, viewModel)
+                            else -> UpdatesTabContent(viewModel, navController) // По умолчанию
+                        }
                     }
                 }
             }
