@@ -30,4 +30,4 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: build-artifacts
-        path: build/libs/*.jar  # Adjust the path according to your build output
+        path: build/*
